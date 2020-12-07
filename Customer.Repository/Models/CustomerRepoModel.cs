@@ -8,6 +8,8 @@ namespace Customer.Repository.Models
     {
         public int CustomerId { get; set; }
 
+        public string CustomerAuthId { get; set; }
+
         public string GivenName { get; set; }
 
         public string FamilyName { get; set; }

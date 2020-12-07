@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Repository", "Cust
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.OrderFacade", "Customer.OrderFacade\Customer.OrderFacade.csproj", "{CA4AEC37-C612-47A9-AD5A-1D7477BB4F20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.UnitTests", "Customer.UnitTests\Customer.UnitTests.csproj", "{8D37D44C-FFC5-4073-BB7B-C6440DC68325}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{CA4AEC37-C612-47A9-AD5A-1D7477BB4F20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA4AEC37-C612-47A9-AD5A-1D7477BB4F20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA4AEC37-C612-47A9-AD5A-1D7477BB4F20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D37D44C-FFC5-4073-BB7B-C6440DC68325}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D37D44C-FFC5-4073-BB7B-C6440DC68325}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D37D44C-FFC5-4073-BB7B-C6440DC68325}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D37D44C-FFC5-4073-BB7B-C6440DC68325}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
