@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace Customer.AccountAPI
 {
@@ -29,9 +30,10 @@ namespace Customer.AccountAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddAutoMapper(typeof(Startup));
             services.AddDbContext<CustomerDb>(options =>
             {
-                var cs = Configuration.GetConnectionString("CustomerConnection");
+                var cs = Configuration.GetConnectionString("CustomerAccount");
                 options.UseSqlServer(cs);
             });
             services.AddScoped<ICustomerRepository, CustomerRepository>();

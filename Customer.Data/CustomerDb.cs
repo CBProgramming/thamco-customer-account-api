@@ -22,6 +22,8 @@ namespace Customer.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.HasDefaultSchema("customeraccount");
+
             modelBuilder.Entity<Customer>()
                 .HasData(
                     new Customer { CustomerId = 1, GivenName = "Chris", FamilyName = "Burrell", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "t7145969@live.tees.ac.uk", RequestedDeletion = false, Active = true }
