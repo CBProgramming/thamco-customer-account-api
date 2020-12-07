@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Customer.OrderFacade
 {
-    class OrderFacade : IOrderFacade
+    public class OrderFacade : IOrderFacade
     {
         private readonly IHttpClientFactory _httpClientFactory;
 

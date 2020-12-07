@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Customer.OrderFacade;
 
 namespace Customer.AccountAPI
 {
@@ -37,6 +38,7 @@ namespace Customer.AccountAPI
                 options.UseSqlServer(cs);
             });
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
