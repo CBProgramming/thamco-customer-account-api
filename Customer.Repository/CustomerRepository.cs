@@ -3,39 +3,104 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Customer.Data;
+using AutoMapper;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Customer.Repository
 {
     public class CustomerRepository : ICustomerRepository
     {
-        public Task<bool> DeleteCustomer(int id)
+        private readonly CustomerDb _context;
+        private readonly IMapper _mapper;
+
+        public CustomerRepository(CustomerDb context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        public async Task<bool> AnonymiseCustomer(CustomerRepoModel anonCustomer)
+        {
+            return await EditCustomer(anonCustomer);
+        }
+
+        public async Task<bool> CustomerExists(int customerId)
+        {
+            return _context.Customers.Any(c => c.CustomerId == customerId);
+        }
+
+        public async Task<bool> DeleteCustomer(int customerId)
+        {
+            return _context.Customers.FirstOrDefault(c => c.CustomerId == customerId).Active;
+        }
+
+        public async Task<bool> EditCustomer(CustomerRepoModel editedCustomer)
+        {
+            if (editedCustomer != null)
+            {
+                var customer = await _context.Customers.FindAsync(editedCustomer.CustomerId);
+                try
+                {
+                    customer.GivenName = editedCustomer.GivenName;
+                    customer.FamilyName = editedCustomer.FamilyName;
+                    customer.AddressOne = editedCustomer.AddressOne;
+                    customer.AddressTwo = editedCustomer.AddressTwo;
+                    customer.Town = editedCustomer.Town;
+                    customer.State = editedCustomer.State;
+                    customer.AreaCode = editedCustomer.AreaCode;
+                    customer.Country = editedCustomer.Country;
+                    customer.EmailAddress = editedCustomer.EmailAddress;
+                    customer.TelephoneNumber = editedCustomer.TelephoneNumber;
+                    customer.CanPurchase = editedCustomer.CanPurchase;
+                    customer.Active = editedCustomer.Active;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+
+                }
+            }
+            return false;
+        }
+
+        public async Task<CustomerRepoModel> GetCustomer(int customerId)
+        {
+            return _mapper.Map<CustomerRepoModel>(_context
+                .Customers
+                .Where(c => c.Active == true)
+                .FirstOrDefault(c => c.CustomerId == customerId));
+        }
+
+        public async Task<IList<CustomerRepoModel>> GetCustomersRequestingDeletion()
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> EditCustomer(CustomerRepoModel customer)
+        public async Task<bool> IsCustomerActive(int customerId)
         {
-            throw new NotImplementedException();
+            return _context.Customers.FirstOrDefault(c => c.CustomerId == customerId).Active;
         }
 
-        public Task<CustomerRepoModel> GetCustomer(int id)
+        public async Task<bool> NewCustomer(CustomerRepoModel newCustomer)
         {
-            throw new NotImplementedException();
-        }
+            if (newCustomer != null)
+            {
+                try
+                {
+                    var customer = _mapper.Map<Data.Customer>(newCustomer);
+                    _context.Add(customer);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                catch (DbUpdateConcurrencyException)
+                {
 
-        public Task<IList<CustomerRepoModel>> GetCustomers()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IList<CustomerRepoModel>> GetCustomersRequestingDeletion()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> NewCustomer(CustomerRepoModel customer)
-        {
-            throw new NotImplementedException();
+                }
+            }
+            return false;
         }
     }
 }

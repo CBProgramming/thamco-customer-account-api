@@ -32,5 +32,7 @@ namespace Customer.AccountAPI.Models
         public bool RequestedDeletion { get; set; }
 
         public bool CanPurchase { get; set; }
+
+        public bool Active { get; set; }
     }
 }

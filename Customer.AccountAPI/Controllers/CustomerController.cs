@@ -1,5 +1,8 @@
-﻿using Customer.AccountAPI.Models;
+﻿using AutoMapper;
+using Customer.AccountAPI.Models;
 using Customer.Repository;
+using Customer.Repository.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,7 +21,7 @@ namespace Customer.AccountAPI.Controllers
         private readonly ICustomerRepository _orderRepository;
         private readonly IMapper _mapper;
 
-        public CustomerController(ILogger<CustomerController> logger, IOrderRepository orderRepository, IMapper mapper)
+        public CustomerController(ILogger<CustomerController> logger, ICustomerRepository orderRepository, IMapper mapper)
         {
             _logger = logger;
             _orderRepository = orderRepository;
@@ -27,7 +30,7 @@ namespace Customer.AccountAPI.Controllers
 
         // GET: api/<controller>
         [HttpGet("{customerId}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Get([FromRoute] int customerId)
         {
             //reaqd from access token
@@ -41,21 +44,14 @@ namespace Customer.AccountAPI.Controllers
                     return Ok(customer);
                 }
             }
-            /*            var customer = _mapper.Map<CustomerDto>(await _orderRepository.GetCustomer(customerId));
-                        if (customer != null)
-                        {
-                            return Ok(customer);
-                        }*/
             return NotFound();
-
-            //return Ok();
         }
 
         // POST api/<controller>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CustomerDto customer)
         {
-            if (await _orderRepository.NewCustomer(_mapper.Map<CustomerEFModel>(customer)))
+            if (await _orderRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
             {
                 return Ok();
             }
@@ -74,14 +70,14 @@ namespace Customer.AccountAPI.Controllers
         {
             if (!await _orderRepository.CustomerExists(customer.CustomerId))
             {
-                if (await _orderRepository.NewCustomer(_mapper.Map<CustomerEFModel>(customer)))
+                if (await _orderRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                 {
                     return Ok();
                 }
             }
             else
             {
-                if (await _orderRepository.EditCustomer(_mapper.Map<CustomerEFModel>(customer)))
+                if (await _orderRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                 {
                     return Ok();
                 }
@@ -118,7 +114,7 @@ namespace Customer.AccountAPI.Controllers
                 CanPurchase = false,
                 Active = false
             };
-            return await _orderRepository.AnonymiseCustomer(_mapper.Map<CustomerEFModel>(customer));
+            return await _orderRepository.AnonymiseCustomer(_mapper.Map<CustomerRepoModel>(customer));
         }
     }
 }

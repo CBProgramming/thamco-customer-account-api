@@ -8,11 +8,9 @@ namespace Customer.Repository.Models
     {
         public int CustomerId { get; set; }
 
-        public string CustomerAuthId { get; set; }
+        public string GivenName { get; set; }
 
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
+        public string FamilyName { get; set; }
 
         public string AddressOne { get; set; }
 
@@ -20,15 +18,19 @@ namespace Customer.Repository.Models
 
         public string Town { get; set; }
 
-        public string County { get; set; }
+        public string State { get; set; }
 
-        public string PostCode { get; set; }
+        public string AreaCode { get; set; }
 
-        public string Email { get; set; }
+        public string Country { get; set; }
 
-        public string Telephone { get; set; }
+        public string EmailAddress { get; set; }
+
+        public string TelephoneNumber { get; set; }
 
         public bool RequestedDeletion { get; set; }
+
+        public bool CanPurchase { get; set; }
 
         public bool Active { get; set; }
     }

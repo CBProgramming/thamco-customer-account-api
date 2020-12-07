@@ -7,16 +7,20 @@ namespace Customer.Repository
 {
     public interface ICustomerRepository
     {
-        public Task<CustomerRepoModel> GetCustomer(int id);
-
-        public Task<IList<CustomerRepoModel>> GetCustomers();
+        public Task<CustomerRepoModel> GetCustomer(int customerId);
 
         public Task<IList<CustomerRepoModel>> GetCustomersRequestingDeletion();
 
-        public Task<bool> NewCustomer(CustomerRepoModel customer);
+        public Task<bool> NewCustomer(CustomerRepoModel newCustomer);
 
-        public Task<bool> EditCustomer(CustomerRepoModel customer);
+        public Task<bool> EditCustomer(CustomerRepoModel editedCustomer);
 
-        public Task<bool> DeleteCustomer(int id);
+        public Task<bool> DeleteCustomer(int customerId);
+
+        public Task<bool> CustomerExists(int customerId);
+
+        public Task<bool> AnonymiseCustomer (CustomerRepoModel anonCustomer);
+
+        public Task<bool> IsCustomerActive(int customerId);
     }
 }
