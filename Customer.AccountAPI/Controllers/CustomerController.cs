@@ -61,8 +61,9 @@ namespace Customer.AccountAPI.Controllers
 
         // PUT api/<controller>/5
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] CustomerDto customer)
+        public async Task<IActionResult> Put([FromRoute] int customerId, [FromBody] CustomerDto customer)
         {
+            customer.CustomerId = customerId;
             return await NewOrEditedCustomer(customer);
         }
 
