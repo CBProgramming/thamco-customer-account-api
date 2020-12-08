@@ -1,5 +1,6 @@
 ﻿using Customer.OrderFacade.Models;
 using IdentityModel.Client;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -11,6 +12,7 @@ namespace Customer.OrderFacade
     public class OrderFacade : IOrderFacade
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        
 
         public OrderFacade(IHttpClientFactory httpClientFactory)
         {
@@ -33,7 +35,7 @@ namespace Customer.OrderFacade
             /*httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
             });*/
-            string uri = "/api/Customer/";
+            string uri = "/api/Customer";
             if (newCustomer)
             {
                 if ((await httpClient.PostAsJsonAsync<OrderingCustomerDto>(uri, customer)).IsSuccessStatusCode)

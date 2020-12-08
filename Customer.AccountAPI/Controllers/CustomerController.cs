@@ -15,6 +15,7 @@ namespace Customer.AccountAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
@@ -51,16 +52,16 @@ namespace Customer.AccountAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CustomerDto customer)
         {
-            if (await _orderRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
+/*            if (await _orderRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
             {
                 return Ok();
             }
-            return NotFound();
-            //return await NewOrEditedCustomer(customer);
+            return NotFound();*/
+            return await NewOrEditedCustomer(customer);
         }
 
         // PUT api/<controller>/5
-        [HttpPut]
+        [HttpPut("{customerId}")]
         public async Task<IActionResult> Put([FromRoute] int customerId, [FromBody] CustomerDto customer)
         {
             customer.CustomerId = customerId;
