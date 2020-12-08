@@ -41,8 +41,8 @@ namespace Customer.AccountAPI
             services.AddAuthentication("Bearer")
             .AddJwtBearer("Bearer", options =>
             {
-                //options.Authority = getAuthority();
-                options.Authority = "https://localhost:43389";
+                options.Authority = getAuthority();
+                //options.Authority = "https://localhost:43389";
                 options.Audience = "customer_account_api";
             });
 
