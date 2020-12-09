@@ -10,6 +10,11 @@ namespace Customer.OrderFacade
     {
         public bool Succeeds = true;
 
+        public Task<bool> DeleteCustomer(int customerId)
+        {
+            return Succeeds;
+        }
+
         public async Task<bool> EditCustomer(OrderingCustomerDto editedCustomer)
         {
             return Succeeds;
