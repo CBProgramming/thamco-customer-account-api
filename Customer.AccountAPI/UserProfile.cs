@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Customer.Data;
+using Customer.OrderFacade.Models;
 
 namespace Customer.AccountAPI
 {
@@ -17,6 +18,8 @@ namespace Customer.AccountAPI
             CreateMap<CustomerRepoModel, CustomerDto>();
             CreateMap<CustomerRepoModel, Data.Customer>();
             CreateMap<Data.Customer, CustomerRepoModel>();
+            CreateMap<CustomerDto, OrderingCustomerDto>();
+            CreateMap<OrderingCustomerDto, CustomerDto>();
         }
     }
 }

@@ -9,5 +9,7 @@ namespace Customer.OrderFacade
         public Task<bool> NewCustomer(OrderingCustomerDto newCustomer);
 
         public Task<bool> EditCustomer(OrderingCustomerDto editedCustomer);
+
+        public Task<bool> DeleteCustomer(int customerId);
     }
 }

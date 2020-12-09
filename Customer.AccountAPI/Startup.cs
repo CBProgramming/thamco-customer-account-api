@@ -86,7 +86,7 @@ namespace Customer.AccountAPI
             {
                 if (clientName.Equals("CustomerOrderingAPI"))
                 {
-                    return "unknown azure website address";
+                    return "https://customerorderingthamco.azurewebsites.net";
                 }
             }
             return "";

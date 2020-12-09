@@ -19,6 +19,17 @@ namespace Customer.OrderFacade
             _httpClientFactory = httpClientFactory;
         }
 
+        public async Task<bool> DeleteCustomer(int customerId)
+        {
+            var httpClient = _httpClientFactory.CreateClient("CustomerOrderAPI");
+            string uri = "/api/Customer/" + customerId;
+            if ((await httpClient.DeleteAsync(uri)).IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public async Task<bool> EditCustomer(OrderingCustomerDto editedCustomer)
         {
             return await UpdateCustomerOrderService(editedCustomer, false);

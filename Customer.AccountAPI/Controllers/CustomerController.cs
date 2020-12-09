@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Customer.AccountAPI.Models;
+using Customer.OrderFacade;
+using Customer.OrderFacade.Models;
 using Customer.Repository;
 using Customer.Repository.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -21,12 +23,14 @@ namespace Customer.AccountAPI.Controllers
         private readonly ILogger<CustomerController> _logger;
         private readonly ICustomerRepository _orderRepository;
         private readonly IMapper _mapper;
+        private readonly IOrderFacade _facade;
 
-        public CustomerController(ILogger<CustomerController> logger, ICustomerRepository orderRepository, IMapper mapper)
+        public CustomerController(ILogger<CustomerController> logger, ICustomerRepository orderRepository, IMapper mapper, IOrderFacade facade)
         {
             _logger = logger;
             _orderRepository = orderRepository;
             _mapper = mapper;
+            _facade = facade;
         }
 
         // GET: api/<controller>
@@ -74,6 +78,10 @@ namespace Customer.AccountAPI.Controllers
             {
                 if (await _orderRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                 {
+                    if(!await _facade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer)));
+                    {
+                        //write to local db to be reattempted later
+                    }
                     return Ok();
                 }
             }
@@ -81,6 +89,10 @@ namespace Customer.AccountAPI.Controllers
             {
                 if (await _orderRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                 {
+                    if (!await _facade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                    {
+                        //write to local db to be reattempted later
+                    }
                     return Ok();
                 }
             }
@@ -93,6 +105,10 @@ namespace Customer.AccountAPI.Controllers
         {
             if (await AnonymiseCustomer(customerId))
             {
+                if (! await _facade.DeleteCustomer(customerId))
+                {
+                    //write to local db to be reattempted later
+                }
                 return Ok();
             }
             return NotFound();

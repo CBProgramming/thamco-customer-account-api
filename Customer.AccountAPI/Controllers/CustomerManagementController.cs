@@ -12,7 +12,7 @@ namespace Customer.AccountAPI.Controllers
     public class CustomerManagementController : ControllerBase
     {
         [HttpPut]
-        public Task<IActionResult> Get(int? customerId, bool? canPurchase)
+        public Task<IActionResult> Put(int? customerId, bool? canPurchase)
         {
             throw new NotImplementedException();
         }
