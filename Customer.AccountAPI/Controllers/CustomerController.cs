@@ -38,15 +38,21 @@ namespace Customer.AccountAPI.Controllers
         //[Authorize]
         public async Task<IActionResult> Get([FromRoute] int customerId)
         {
-            //reaqd from access token
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-
-            if (await _orderRepository.CustomerExists(customerId))
+            if (await _orderRepository.CustomerExists(customerId)
+                && await _orderRepository.IsCustomerActive(customerId))
             {
                 var customer = _mapper.Map<CustomerDto>(await _orderRepository.GetCustomer(customerId));
                 if (customer != null)
                 {
-                    return Ok(customer);
+                    //read from access token
+                    var userId = User
+                        .Claims
+                        .FirstOrDefault(c => c.Type == "sub")?.Value;
+                    if (customer.CustomerAuthId == userId)
+                    {
+                        return Ok(customer);
+                    }
+                    return Forbid();
                 }
             }
             return NotFound();

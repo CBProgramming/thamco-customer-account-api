@@ -56,7 +56,7 @@ namespace Customer.AccountAPI
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             if (Env.IsDevelopment())
             {
-                services.AddScoped<IOrderFacade, FakeFacade>();
+                services.AddScoped<IOrderFacade, FakeOrderFacade>();
             }
             else
             {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Customer.OrderFacade
 {
-    public class FakeFacade : IOrderFacade
+    public class FakeOrderFacade : IOrderFacade
     {
         public bool Succeeds = true;
 

@@ -9,20 +9,46 @@ namespace Customer.Repository
     public class FakeCustomerRepository : ICustomerRepository
     {
         public CustomerRepoModel Customer { get; set; }
+        public bool autoSucceeds = false;
+        public bool autoFails = false;
 
-        public Task<bool> AnonymiseCustomer(CustomerRepoModel anonCustomer)
+        public async Task<bool> AnonymiseCustomer(CustomerRepoModel anonCustomer)
         {
-            throw new NotImplementedException();
+            if (autoSucceeds)
+            {
+                return true;
+            }
+            if (autoFails)
+            {
+                return false;
+            }
+            return true;
         }
 
-        public Task<bool> CustomerExists(int customerId)
+        public async Task<bool> CustomerExists(int customerId)
         {
-            throw new NotImplementedException();
+            if (autoSucceeds)
+            {
+                return true;
+            }
+            if (autoFails)
+            {
+                return false;
+            }
+            return customerId == Customer.CustomerId;
         }
 
-        public Task<bool> DeleteCustomer(int customerId)
+        public async Task<bool> DeleteCustomer(int customerId)
         {
-            throw new NotImplementedException();
+            if (autoSucceeds)
+            {
+                return true;
+            }
+            if (autoFails)
+            {
+                return false;
+            }
+            return customerId == Customer.CustomerId;
         }
 
         public Task<bool> EditCustomer(CustomerRepoModel editedCustomer)
@@ -30,9 +56,13 @@ namespace Customer.Repository
             throw new NotImplementedException();
         }
 
-        public Task<CustomerRepoModel> GetCustomer(int customerId)
+        public async Task<CustomerRepoModel> GetCustomer(int customerId)
         {
-            throw new NotImplementedException();
+            if (Customer.CustomerId == customerId)
+            {
+                return Customer;
+            }
+            return null;
         }
 
         public Task<IList<CustomerRepoModel>> GetCustomersRequestingDeletion()
@@ -40,9 +70,9 @@ namespace Customer.Repository
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsCustomerActive(int customerId)
+        public async Task<bool> IsCustomerActive(int customerId)
         {
-            throw new NotImplementedException();
+            return Customer.Active;
         }
 
         public Task<bool> NewCustomer(CustomerRepoModel newCustomer)
