@@ -86,7 +86,12 @@ namespace Customer.Repository
 
         public async Task<bool> MatchingAuthId(int customerId, string authId)
         {
-            return _context.Customers.FirstOrDefault(c => c.CustomerId == customerId).CustomerAuthId.Equals(authId);
+            var customer = _context.Customers.FirstOrDefault(c => c.CustomerId == customerId);
+            if (customer != null)
+            {
+                return customer.CustomerAuthId.Equals(authId);
+            }
+            return false;
         }
 
         public async Task<bool> NewCustomer(CustomerRepoModel newCustomer)

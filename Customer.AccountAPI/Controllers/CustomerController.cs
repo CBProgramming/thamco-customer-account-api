@@ -17,7 +17,7 @@ namespace Customer.AccountAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = "CustomerOnly")]
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
@@ -45,6 +45,8 @@ namespace Customer.AccountAPI.Controllers
                 if (customer != null)
                 {
                     //read from access token
+                    var user = User;
+                    var claims = User.Claims;
                     var userId = User
                         .Claims
                         .FirstOrDefault(c => c.Type == "sub")?.Value;

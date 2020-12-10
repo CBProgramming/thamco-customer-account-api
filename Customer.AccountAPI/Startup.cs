@@ -19,6 +19,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Logging;
 using Polly;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Customer.AccountAPI
 {
@@ -42,8 +43,14 @@ namespace Customer.AccountAPI
             .AddJwtBearer("Bearer", options =>
             {
                 options.Authority = getAuthority();
-                //options.Authority = "https://localhost:43389";
                 options.Audience = "customer_account_api";
+            });
+            services.AddAuthorization(OptionsBuilderConfigurationExtensions =>
+            {
+                OptionsBuilderConfigurationExtensions.AddPolicy("CustomerOnly", builder =>
+                {
+                    builder.RequireClaim("role", "Customer");
+                });
             });
 
             services.AddControllers();
