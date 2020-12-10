@@ -16,12 +16,14 @@ namespace Customer.Repository
         {
             if (autoSucceeds)
             {
+                Customer = anonCustomer;
                 return true;
             }
             if (autoFails)
             {
                 return false;
             }
+            Customer = anonCustomer;
             return true;
         }
 
@@ -31,7 +33,7 @@ namespace Customer.Repository
             {
                 return true;
             }
-            if (autoFails)
+            if (autoFails || Customer == null)
             {
                 return false;
             }
@@ -48,12 +50,21 @@ namespace Customer.Repository
             {
                 return false;
             }
-            return customerId == Customer.CustomerId;
+            return customerId == Customer.CustomerId && Customer.Active;
         }
 
-        public Task<bool> EditCustomer(CustomerRepoModel editedCustomer)
+        public async Task<bool> EditCustomer(CustomerRepoModel editedCustomer)
         {
-            throw new NotImplementedException();
+            if (editedCustomer != null)
+            {
+                if (Customer != null && editedCustomer.CustomerId == Customer.CustomerId)
+                {
+                    Customer = editedCustomer;
+                    return true;
+                }
+                else return await NewCustomer(editedCustomer);
+            }
+            return false;
         }
 
         public async Task<CustomerRepoModel> GetCustomer(int customerId)
@@ -75,9 +86,23 @@ namespace Customer.Repository
             return Customer.Active;
         }
 
-        public Task<bool> NewCustomer(CustomerRepoModel newCustomer)
+        public async Task<bool> NewCustomer(CustomerRepoModel newCustomer)
         {
-            throw new NotImplementedException();
+            if (newCustomer != null)
+            {
+                if (Customer == null || newCustomer.CustomerId != Customer.CustomerId)
+                {
+                    Customer = newCustomer;
+                    return true;
+                }
+                else return await EditCustomer(newCustomer);
+            }
+            return false;
+        }
+
+        public async Task<bool> MatchingAuthId(int customerId, string authId)
+        {
+            return Customer != null && authId.Equals(Customer.CustomerAuthId);
         }
     }
 }

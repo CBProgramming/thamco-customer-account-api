@@ -21,14 +21,14 @@ namespace Customer.AccountAPI.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
-        private readonly ICustomerRepository _orderRepository;
+        private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
         private readonly IOrderFacade _facade;
 
-        public CustomerController(ILogger<CustomerController> logger, ICustomerRepository orderRepository, IMapper mapper, IOrderFacade facade)
+        public CustomerController(ILogger<CustomerController> logger, ICustomerRepository customerRepository, IMapper mapper, IOrderFacade facade)
         {
             _logger = logger;
-            _orderRepository = orderRepository;
+            _customerRepository = customerRepository;
             _mapper = mapper;
             _facade = facade;
         }
@@ -38,10 +38,10 @@ namespace Customer.AccountAPI.Controllers
         //[Authorize]
         public async Task<IActionResult> Get([FromRoute] int customerId)
         {
-            if (await _orderRepository.CustomerExists(customerId)
-                && await _orderRepository.IsCustomerActive(customerId))
+            if (await _customerRepository.CustomerExists(customerId)
+                && await _customerRepository.IsCustomerActive(customerId))
             {
-                var customer = _mapper.Map<CustomerDto>(await _orderRepository.GetCustomer(customerId));
+                var customer = _mapper.Map<CustomerDto>(await _customerRepository.GetCustomer(customerId));
                 if (customer != null)
                 {
                     //read from access token
@@ -62,11 +62,6 @@ namespace Customer.AccountAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CustomerDto customer)
         {
-/*            if (await _orderRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
-            {
-                return Ok();
-            }
-            return NotFound();*/
             return await NewOrEditedCustomer(customer);
         }
 
@@ -75,14 +70,15 @@ namespace Customer.AccountAPI.Controllers
         public async Task<IActionResult> Put([FromRoute] int customerId, [FromBody] CustomerDto customer)
         {
             customer.CustomerId = customerId;
+            customer.Active = true;
             return await NewOrEditedCustomer(customer);
         }
 
         private async Task<IActionResult> NewOrEditedCustomer(CustomerDto customer)
         {
-            if (!await _orderRepository.CustomerExists(customer.CustomerId))
+            if (!await _customerRepository.CustomerExists(customer.CustomerId))
             {
-                if (await _orderRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
+                if (await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                 {
                     if(!await _facade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer)));
                     {
@@ -93,13 +89,23 @@ namespace Customer.AccountAPI.Controllers
             }
             else
             {
-                if (await _orderRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
+                if (await _customerRepository.IsCustomerActive(customer.CustomerId))
                 {
-                    if (!await _facade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                    var authId = User
+                                .Claims
+                                .FirstOrDefault(c => c.Type == "sub")?.Value;
+                    if (! await _customerRepository.MatchingAuthId(customer.CustomerId, authId))
                     {
-                        //write to local db to be reattempted later
+                        return Forbid();
                     }
-                    return Ok();
+                    if (await _customerRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
+                    {
+                        if (!await _facade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                        {
+                            //write to local db to be reattempted later
+                        }
+                        return Ok();
+                    }
                 }
             }
             return NotFound();
@@ -109,15 +115,23 @@ namespace Customer.AccountAPI.Controllers
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> Delete([FromRoute] int customerId)
         {
-            if (await AnonymiseCustomer(customerId))
+            var authId = User
+                        .Claims
+                        .FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (await _customerRepository.MatchingAuthId(customerId, authId))
             {
-                if (! await _facade.DeleteCustomer(customerId))
+                if (await _customerRepository.CustomerExists(customerId)
+                       && await AnonymiseCustomer(customerId))
                 {
-                    //write to local db to be reattempted later
+                    if (!await _facade.DeleteCustomer(customerId))
+                    {
+                        //write to local db to be reattempted later
+                    }
+                    return Ok();
                 }
-                return Ok();
+                return NotFound();
             }
-            return NotFound();
+            return Forbid();
         }
 
         private async Task<bool> AnonymiseCustomer(int customerId)
@@ -138,7 +152,7 @@ namespace Customer.AccountAPI.Controllers
                 CanPurchase = false,
                 Active = false
             };
-            return await _orderRepository.AnonymiseCustomer(_mapper.Map<CustomerRepoModel>(customer));
+            return await _customerRepository.AnonymiseCustomer(_mapper.Map<CustomerRepoModel>(customer));
         }
     }
 }

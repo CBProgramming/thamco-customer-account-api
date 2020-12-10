@@ -22,5 +22,7 @@ namespace Customer.Repository
         public Task<bool> AnonymiseCustomer (CustomerRepoModel anonCustomer);
 
         public Task<bool> IsCustomerActive(int customerId);
+
+        public Task<bool> MatchingAuthId(int customerId, string authId);
     }
 }
