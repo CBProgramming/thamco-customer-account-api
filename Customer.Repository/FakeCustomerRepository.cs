@@ -69,7 +69,7 @@ namespace Customer.Repository
 
         public async Task<CustomerRepoModel> GetCustomer(int customerId)
         {
-            if (Customer.CustomerId == customerId)
+            if (Customer != null && Customer.CustomerId == customerId)
             {
                 return Customer;
             }

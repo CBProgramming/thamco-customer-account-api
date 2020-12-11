@@ -406,21 +406,21 @@ namespace Customer.UnitTests
             var objResult = result as OkResult;
             Assert.NotNull(objResult);
             Assert.NotNull(fakeRepo.Customer);
-            Assert.Equal(customerRepoModel.CustomerId, customerDto.CustomerId);
-            Assert.Equal(customerRepoModel.CustomerAuthId, customerDto.CustomerAuthId);
-            Assert.Equal(customerRepoModel.GivenName, customerDto.GivenName);
-            Assert.Equal(customerRepoModel.FamilyName, customerDto.FamilyName);
-            Assert.Equal(customerRepoModel.AddressOne, customerDto.AddressOne);
-            Assert.Equal(customerRepoModel.AddressTwo, customerDto.AddressTwo);
-            Assert.Equal(customerRepoModel.Town, customerDto.Town);
-            Assert.Equal(customerRepoModel.State, customerDto.State);
-            Assert.Equal(customerRepoModel.AreaCode, customerDto.AreaCode);
-            Assert.Equal(customerRepoModel.Country, customerDto.Country);
-            Assert.Equal(customerRepoModel.EmailAddress, customerDto.EmailAddress);
-            Assert.Equal(customerRepoModel.TelephoneNumber, customerDto.TelephoneNumber);
-            Assert.Equal(customerRepoModel.RequestedDeletion, customerDto.RequestedDeletion);
-            Assert.Equal(customerRepoModel.CanPurchase, customerDto.CanPurchase);
-            Assert.Equal(customerRepoModel.Active, customerDto.Active);
+            Assert.Equal(fakeRepo.Customer.CustomerId, customerDto.CustomerId);
+            Assert.Equal(fakeRepo.Customer.CustomerAuthId, customerDto.CustomerAuthId);
+            Assert.Equal(fakeRepo.Customer.GivenName, customerDto.GivenName);
+            Assert.Equal(fakeRepo.Customer.FamilyName, customerDto.FamilyName);
+            Assert.Equal(fakeRepo.Customer.AddressOne, customerDto.AddressOne);
+            Assert.Equal(fakeRepo.Customer.AddressTwo, customerDto.AddressTwo);
+            Assert.Equal(fakeRepo.Customer.Town, customerDto.Town);
+            Assert.Equal(fakeRepo.Customer.State, customerDto.State);
+            Assert.Equal(fakeRepo.Customer.AreaCode, customerDto.AreaCode);
+            Assert.Equal(fakeRepo.Customer.Country, customerDto.Country);
+            Assert.Equal(fakeRepo.Customer.EmailAddress, customerDto.EmailAddress);
+            Assert.Equal(fakeRepo.Customer.TelephoneNumber, customerDto.TelephoneNumber);
+            Assert.Equal(fakeRepo.Customer.RequestedDeletion, customerDto.RequestedDeletion);
+            Assert.Equal(fakeRepo.Customer.CanPurchase, customerDto.CanPurchase);
+            Assert.Equal(fakeRepo.Customer.Active, customerDto.Active);
         }
 
         [Fact]
@@ -459,21 +459,21 @@ namespace Customer.UnitTests
             var objResult = result as OkResult;
             Assert.NotNull(objResult);
             Assert.NotNull(fakeRepo.Customer);
-            Assert.Equal(customerRepoModel.CustomerId, customerDto.CustomerId);
-            Assert.Equal(customerRepoModel.CustomerAuthId, customerDto.CustomerAuthId);
-            Assert.Equal(customerRepoModel.GivenName, customerDto.GivenName);
-            Assert.Equal(customerRepoModel.FamilyName, customerDto.FamilyName);
-            Assert.Equal(customerRepoModel.AddressOne, customerDto.AddressOne);
-            Assert.Equal(customerRepoModel.AddressTwo, customerDto.AddressTwo);
-            Assert.Equal(customerRepoModel.Town, customerDto.Town);
-            Assert.Equal(customerRepoModel.State, customerDto.State);
-            Assert.Equal(customerRepoModel.AreaCode, customerDto.AreaCode);
-            Assert.Equal(customerRepoModel.Country, customerDto.Country);
-            Assert.Equal(customerRepoModel.EmailAddress, customerDto.EmailAddress);
-            Assert.Equal(customerRepoModel.TelephoneNumber, customerDto.TelephoneNumber);
-            Assert.Equal(customerRepoModel.RequestedDeletion, customerDto.RequestedDeletion);
-            Assert.Equal(customerRepoModel.CanPurchase, customerDto.CanPurchase);
-            Assert.Equal(customerRepoModel.Active, customerDto.Active);
+            Assert.Equal(fakeRepo.Customer.CustomerId, customerDto.CustomerId);
+            Assert.Equal(fakeRepo.Customer.CustomerAuthId, customerDto.CustomerAuthId);
+            Assert.Equal(fakeRepo.Customer.GivenName, customerDto.GivenName);
+            Assert.Equal(fakeRepo.Customer.FamilyName, customerDto.FamilyName);
+            Assert.Equal(fakeRepo.Customer.AddressOne, customerDto.AddressOne);
+            Assert.Equal(fakeRepo.Customer.AddressTwo, customerDto.AddressTwo);
+            Assert.Equal(fakeRepo.Customer.Town, customerDto.Town);
+            Assert.Equal(fakeRepo.Customer.State, customerDto.State);
+            Assert.Equal(fakeRepo.Customer.AreaCode, customerDto.AreaCode);
+            Assert.Equal(fakeRepo.Customer.Country, customerDto.Country);
+            Assert.Equal(fakeRepo.Customer.EmailAddress, customerDto.EmailAddress);
+            Assert.Equal(fakeRepo.Customer.TelephoneNumber, customerDto.TelephoneNumber);
+            Assert.Equal(fakeRepo.Customer.RequestedDeletion, customerDto.RequestedDeletion);
+            Assert.Equal(fakeRepo.Customer.CanPurchase, customerDto.CanPurchase);
+            Assert.Equal(fakeRepo.Customer.Active, customerDto.Active);
         }
 
         [Fact]
@@ -516,21 +516,21 @@ namespace Customer.UnitTests
             var objResult = result as NotFoundResult;
             Assert.NotNull(objResult);
             Assert.NotNull(fakeRepo.Customer);
-            Assert.Equal(customerRepoModel.CustomerId, editedCustomer.CustomerId);
-            Assert.Equal(customerRepoModel.CustomerAuthId, editedCustomer.CustomerAuthId);
-            Assert.NotEqual(customerRepoModel.GivenName, editedCustomer.GivenName);
-            Assert.NotEqual(customerRepoModel.FamilyName, editedCustomer.FamilyName);
-            Assert.NotEqual(customerRepoModel.AddressOne, editedCustomer.AddressOne);
-            Assert.NotEqual(customerRepoModel.AddressTwo, editedCustomer.AddressTwo);
-            Assert.NotEqual(customerRepoModel.Town, editedCustomer.Town);
-            Assert.NotEqual(customerRepoModel.State, editedCustomer.State);
-            Assert.NotEqual(customerRepoModel.AreaCode, editedCustomer.AreaCode);
-            Assert.NotEqual(customerRepoModel.Country, editedCustomer.Country);
-            Assert.NotEqual(customerRepoModel.EmailAddress, editedCustomer.EmailAddress);
-            Assert.NotEqual(customerRepoModel.TelephoneNumber, editedCustomer.TelephoneNumber);
-            Assert.Equal(customerRepoModel.RequestedDeletion, editedCustomer.RequestedDeletion);
-            Assert.Equal(customerRepoModel.CanPurchase, editedCustomer.CanPurchase);
-            Assert.NotEqual(customerRepoModel.Active, editedCustomer.Active);
+            Assert.Equal(fakeRepo.Customer.CustomerId, editedCustomer.CustomerId);
+            Assert.Equal(fakeRepo.Customer.CustomerAuthId, editedCustomer.CustomerAuthId);
+            Assert.NotEqual(fakeRepo.Customer.GivenName, editedCustomer.GivenName);
+            Assert.NotEqual(fakeRepo.Customer.FamilyName, editedCustomer.FamilyName);
+            Assert.NotEqual(fakeRepo.Customer.AddressOne, editedCustomer.AddressOne);
+            Assert.NotEqual(fakeRepo.Customer.AddressTwo, editedCustomer.AddressTwo);
+            Assert.NotEqual(fakeRepo.Customer.Town, editedCustomer.Town);
+            Assert.NotEqual(fakeRepo.Customer.State, editedCustomer.State);
+            Assert.NotEqual(fakeRepo.Customer.AreaCode, editedCustomer.AreaCode);
+            Assert.NotEqual(fakeRepo.Customer.Country, editedCustomer.Country);
+            Assert.NotEqual(fakeRepo.Customer.EmailAddress, editedCustomer.EmailAddress);
+            Assert.NotEqual(fakeRepo.Customer.TelephoneNumber, editedCustomer.TelephoneNumber);
+            Assert.Equal(fakeRepo.Customer.RequestedDeletion, editedCustomer.RequestedDeletion);
+            Assert.Equal(fakeRepo.Customer.CanPurchase, editedCustomer.CanPurchase);
+            Assert.NotEqual(fakeRepo.Customer.Active, editedCustomer.Active);
         }
 
         [Fact]
@@ -559,7 +559,7 @@ namespace Customer.UnitTests
         }
 
         [Fact]
-        public async void PostNewCustomer_AuthIdDoesntMatch_ShouldNotForbid()
+        public async void PostNewCustomer_AuthIdDoesntMatch_ShouldForbid()
         {
             //Arrange
             DefaultSetup();
@@ -574,21 +574,21 @@ namespace Customer.UnitTests
             var objResult = result as ForbidResult;
             Assert.NotNull(objResult);
             Assert.NotNull(fakeRepo.Customer);
-            Assert.Equal(customerRepoModel.CustomerId, editedCustomer.CustomerId);
-            Assert.NotEqual(customerRepoModel.CustomerAuthId, editedCustomer.CustomerAuthId);
-            Assert.NotEqual(customerRepoModel.GivenName, editedCustomer.GivenName);
-            Assert.NotEqual(customerRepoModel.FamilyName, editedCustomer.FamilyName);
-            Assert.NotEqual(customerRepoModel.AddressOne, editedCustomer.AddressOne);
-            Assert.NotEqual(customerRepoModel.AddressTwo, editedCustomer.AddressTwo);
-            Assert.NotEqual(customerRepoModel.Town, editedCustomer.Town);
-            Assert.NotEqual(customerRepoModel.State, editedCustomer.State);
-            Assert.NotEqual(customerRepoModel.AreaCode, editedCustomer.AreaCode);
-            Assert.NotEqual(customerRepoModel.Country, editedCustomer.Country);
-            Assert.NotEqual(customerRepoModel.EmailAddress, editedCustomer.EmailAddress);
-            Assert.NotEqual(customerRepoModel.TelephoneNumber, editedCustomer.TelephoneNumber);
-            Assert.Equal(customerRepoModel.RequestedDeletion, editedCustomer.RequestedDeletion);
-            Assert.Equal(customerRepoModel.CanPurchase, editedCustomer.CanPurchase);
-            Assert.Equal(customerRepoModel.Active, editedCustomer.Active);
+            Assert.Equal(fakeRepo.Customer.CustomerId, editedCustomer.CustomerId);
+            Assert.NotEqual(fakeRepo.Customer.CustomerAuthId, editedCustomer.CustomerAuthId);
+            Assert.NotEqual(fakeRepo.Customer.GivenName, editedCustomer.GivenName);
+            Assert.NotEqual(fakeRepo.Customer.FamilyName, editedCustomer.FamilyName);
+            Assert.NotEqual(fakeRepo.Customer.AddressOne, editedCustomer.AddressOne);
+            Assert.NotEqual(fakeRepo.Customer.AddressTwo, editedCustomer.AddressTwo);
+            Assert.NotEqual(fakeRepo.Customer.Town, editedCustomer.Town);
+            Assert.NotEqual(fakeRepo.Customer.State, editedCustomer.State);
+            Assert.NotEqual(fakeRepo.Customer.AreaCode, editedCustomer.AreaCode);
+            Assert.NotEqual(fakeRepo.Customer.Country, editedCustomer.Country);
+            Assert.NotEqual(fakeRepo.Customer.EmailAddress, editedCustomer.EmailAddress);
+            Assert.NotEqual(fakeRepo.Customer.TelephoneNumber, editedCustomer.TelephoneNumber);
+            Assert.Equal(fakeRepo.Customer.RequestedDeletion, editedCustomer.RequestedDeletion);
+            Assert.Equal(fakeRepo.Customer.CanPurchase, editedCustomer.CanPurchase);
+            Assert.Equal(fakeRepo.Customer.Active, editedCustomer.Active);
         }
 
         [Fact]
@@ -632,21 +632,21 @@ namespace Customer.UnitTests
             var objResult = result as OkResult;
             Assert.NotNull(objResult);
             Assert.NotNull(fakeRepo.Customer);
-            Assert.Equal(customerRepoModel.CustomerId, customerDto.CustomerId);
-            Assert.Equal(customerRepoModel.CustomerAuthId, customerDto.CustomerAuthId);
-            Assert.Equal(customerRepoModel.GivenName, customerDto.GivenName);
-            Assert.Equal(customerRepoModel.FamilyName, customerDto.FamilyName);
-            Assert.Equal(customerRepoModel.AddressOne, customerDto.AddressOne);
-            Assert.Equal(customerRepoModel.AddressTwo, customerDto.AddressTwo);
-            Assert.Equal(customerRepoModel.Town, customerDto.Town);
-            Assert.Equal(customerRepoModel.State, customerDto.State);
-            Assert.Equal(customerRepoModel.AreaCode, customerDto.AreaCode);
-            Assert.Equal(customerRepoModel.Country, customerDto.Country);
-            Assert.Equal(customerRepoModel.EmailAddress, customerDto.EmailAddress);
-            Assert.Equal(customerRepoModel.TelephoneNumber, customerDto.TelephoneNumber);
-            Assert.Equal(customerRepoModel.RequestedDeletion, customerDto.RequestedDeletion);
-            Assert.Equal(customerRepoModel.CanPurchase, customerDto.CanPurchase);
-            Assert.Equal(customerRepoModel.Active, customerDto.Active);
+            Assert.Equal(fakeRepo.Customer.CustomerId, customerDto.CustomerId);
+            Assert.Equal(fakeRepo.Customer.CustomerAuthId, customerDto.CustomerAuthId);
+            Assert.Equal(fakeRepo.Customer.GivenName, customerDto.GivenName);
+            Assert.Equal(fakeRepo.Customer.FamilyName, customerDto.FamilyName);
+            Assert.Equal(fakeRepo.Customer.AddressOne, customerDto.AddressOne);
+            Assert.Equal(fakeRepo.Customer.AddressTwo, customerDto.AddressTwo);
+            Assert.Equal(fakeRepo.Customer.Town, customerDto.Town);
+            Assert.Equal(fakeRepo.Customer.State, customerDto.State);
+            Assert.Equal(fakeRepo.Customer.AreaCode, customerDto.AreaCode);
+            Assert.Equal(fakeRepo.Customer.Country, customerDto.Country);
+            Assert.Equal(fakeRepo.Customer.EmailAddress, customerDto.EmailAddress);
+            Assert.Equal(fakeRepo.Customer.TelephoneNumber, customerDto.TelephoneNumber);
+            Assert.Equal(fakeRepo.Customer.RequestedDeletion, customerDto.RequestedDeletion);
+            Assert.Equal(fakeRepo.Customer.CanPurchase, customerDto.CanPurchase);
+            Assert.Equal(fakeRepo.Customer.Active, customerDto.Active);
         }
 
         [Fact]
@@ -685,21 +685,21 @@ namespace Customer.UnitTests
             var objResult = result as OkResult;
             Assert.NotNull(objResult);
             Assert.NotNull(fakeRepo.Customer);
-            Assert.Equal(customerRepoModel.CustomerId, customerDto.CustomerId);
-            Assert.Equal(customerRepoModel.CustomerAuthId, customerDto.CustomerAuthId);
-            Assert.Equal(customerRepoModel.GivenName, customerDto.GivenName);
-            Assert.Equal(customerRepoModel.FamilyName, customerDto.FamilyName);
-            Assert.Equal(customerRepoModel.AddressOne, customerDto.AddressOne);
-            Assert.Equal(customerRepoModel.AddressTwo, customerDto.AddressTwo);
-            Assert.Equal(customerRepoModel.Town, customerDto.Town);
-            Assert.Equal(customerRepoModel.State, customerDto.State);
-            Assert.Equal(customerRepoModel.AreaCode, customerDto.AreaCode);
-            Assert.Equal(customerRepoModel.Country, customerDto.Country);
-            Assert.Equal(customerRepoModel.EmailAddress, customerDto.EmailAddress);
-            Assert.Equal(customerRepoModel.TelephoneNumber, customerDto.TelephoneNumber);
-            Assert.Equal(customerRepoModel.RequestedDeletion, customerDto.RequestedDeletion);
-            Assert.Equal(customerRepoModel.CanPurchase, customerDto.CanPurchase);
-            Assert.Equal(customerRepoModel.Active, customerDto.Active);
+            Assert.Equal(fakeRepo.Customer.CustomerId, customerDto.CustomerId);
+            Assert.Equal(fakeRepo.Customer.CustomerAuthId, customerDto.CustomerAuthId);
+            Assert.Equal(fakeRepo.Customer.GivenName, customerDto.GivenName);
+            Assert.Equal(fakeRepo.Customer.FamilyName, customerDto.FamilyName);
+            Assert.Equal(fakeRepo.Customer.AddressOne, customerDto.AddressOne);
+            Assert.Equal(fakeRepo.Customer.AddressTwo, customerDto.AddressTwo);
+            Assert.Equal(fakeRepo.Customer.Town, customerDto.Town);
+            Assert.Equal(fakeRepo.Customer.State, customerDto.State);
+            Assert.Equal(fakeRepo.Customer.AreaCode, customerDto.AreaCode);
+            Assert.Equal(fakeRepo.Customer.Country, customerDto.Country);
+            Assert.Equal(fakeRepo.Customer.EmailAddress, customerDto.EmailAddress);
+            Assert.Equal(fakeRepo.Customer.TelephoneNumber, customerDto.TelephoneNumber);
+            Assert.Equal(fakeRepo.Customer.RequestedDeletion, customerDto.RequestedDeletion);
+            Assert.Equal(fakeRepo.Customer.CanPurchase, customerDto.CanPurchase);
+            Assert.Equal(fakeRepo.Customer.Active, customerDto.Active);
         }
 
         [Fact]
@@ -742,21 +742,21 @@ namespace Customer.UnitTests
             var objResult = result as NotFoundResult;
             Assert.NotNull(objResult);
             Assert.NotNull(fakeRepo.Customer);
-            Assert.Equal(customerRepoModel.CustomerId, editedCustomer.CustomerId);
-            Assert.Equal(customerRepoModel.CustomerAuthId, editedCustomer.CustomerAuthId);
-            Assert.NotEqual(customerRepoModel.GivenName, editedCustomer.GivenName);
-            Assert.NotEqual(customerRepoModel.FamilyName, editedCustomer.FamilyName);
-            Assert.NotEqual(customerRepoModel.AddressOne, editedCustomer.AddressOne);
-            Assert.NotEqual(customerRepoModel.AddressTwo, editedCustomer.AddressTwo);
-            Assert.NotEqual(customerRepoModel.Town, editedCustomer.Town);
-            Assert.NotEqual(customerRepoModel.State, editedCustomer.State);
-            Assert.NotEqual(customerRepoModel.AreaCode, editedCustomer.AreaCode);
-            Assert.NotEqual(customerRepoModel.Country, editedCustomer.Country);
-            Assert.NotEqual(customerRepoModel.EmailAddress, editedCustomer.EmailAddress);
-            Assert.NotEqual(customerRepoModel.TelephoneNumber, editedCustomer.TelephoneNumber);
-            Assert.Equal(customerRepoModel.RequestedDeletion, editedCustomer.RequestedDeletion);
-            Assert.Equal(customerRepoModel.CanPurchase, editedCustomer.CanPurchase);
-            Assert.NotEqual(customerRepoModel.Active, editedCustomer.Active);
+            Assert.Equal(fakeRepo.Customer.CustomerId, editedCustomer.CustomerId);
+            Assert.Equal(fakeRepo.Customer.CustomerAuthId, editedCustomer.CustomerAuthId);
+            Assert.NotEqual(fakeRepo.Customer.GivenName, editedCustomer.GivenName);
+            Assert.NotEqual(fakeRepo.Customer.FamilyName, editedCustomer.FamilyName);
+            Assert.NotEqual(fakeRepo.Customer.AddressOne, editedCustomer.AddressOne);
+            Assert.NotEqual(fakeRepo.Customer.AddressTwo, editedCustomer.AddressTwo);
+            Assert.NotEqual(fakeRepo.Customer.Town, editedCustomer.Town);
+            Assert.NotEqual(fakeRepo.Customer.State, editedCustomer.State);
+            Assert.NotEqual(fakeRepo.Customer.AreaCode, editedCustomer.AreaCode);
+            Assert.NotEqual(fakeRepo.Customer.Country, editedCustomer.Country);
+            Assert.NotEqual(fakeRepo.Customer.EmailAddress, editedCustomer.EmailAddress);
+            Assert.NotEqual(fakeRepo.Customer.TelephoneNumber, editedCustomer.TelephoneNumber);
+            Assert.Equal(fakeRepo.Customer.RequestedDeletion, editedCustomer.RequestedDeletion);
+            Assert.Equal(fakeRepo.Customer.CanPurchase, editedCustomer.CanPurchase);
+            Assert.NotEqual(fakeRepo.Customer.Active, editedCustomer.Active);
         }
 
         [Fact]
@@ -800,21 +800,21 @@ namespace Customer.UnitTests
             var objResult = result as ForbidResult;
             Assert.NotNull(objResult);
             Assert.NotNull(fakeRepo.Customer);
-            Assert.Equal(customerRepoModel.CustomerId, editedCustomer.CustomerId);
-            Assert.NotEqual(customerRepoModel.CustomerAuthId, editedCustomer.CustomerAuthId);
-            Assert.NotEqual(customerRepoModel.GivenName, editedCustomer.GivenName);
-            Assert.NotEqual(customerRepoModel.FamilyName, editedCustomer.FamilyName);
-            Assert.NotEqual(customerRepoModel.AddressOne, editedCustomer.AddressOne);
-            Assert.NotEqual(customerRepoModel.AddressTwo, editedCustomer.AddressTwo);
-            Assert.NotEqual(customerRepoModel.Town, editedCustomer.Town);
-            Assert.NotEqual(customerRepoModel.State, editedCustomer.State);
-            Assert.NotEqual(customerRepoModel.AreaCode, editedCustomer.AreaCode);
-            Assert.NotEqual(customerRepoModel.Country, editedCustomer.Country);
-            Assert.NotEqual(customerRepoModel.EmailAddress, editedCustomer.EmailAddress);
-            Assert.NotEqual(customerRepoModel.TelephoneNumber, editedCustomer.TelephoneNumber);
-            Assert.Equal(customerRepoModel.RequestedDeletion, editedCustomer.RequestedDeletion);
-            Assert.Equal(customerRepoModel.CanPurchase, editedCustomer.CanPurchase);
-            Assert.Equal(customerRepoModel.Active, editedCustomer.Active);
+            Assert.Equal(fakeRepo.Customer.CustomerId, editedCustomer.CustomerId);
+            Assert.NotEqual(fakeRepo.Customer.CustomerAuthId, editedCustomer.CustomerAuthId);
+            Assert.NotEqual(fakeRepo.Customer.GivenName, editedCustomer.GivenName);
+            Assert.NotEqual(fakeRepo.Customer.FamilyName, editedCustomer.FamilyName);
+            Assert.NotEqual(fakeRepo.Customer.AddressOne, editedCustomer.AddressOne);
+            Assert.NotEqual(fakeRepo.Customer.AddressTwo, editedCustomer.AddressTwo);
+            Assert.NotEqual(fakeRepo.Customer.Town, editedCustomer.Town);
+            Assert.NotEqual(fakeRepo.Customer.State, editedCustomer.State);
+            Assert.NotEqual(fakeRepo.Customer.AreaCode, editedCustomer.AreaCode);
+            Assert.NotEqual(fakeRepo.Customer.Country, editedCustomer.Country);
+            Assert.NotEqual(fakeRepo.Customer.EmailAddress, editedCustomer.EmailAddress);
+            Assert.NotEqual(fakeRepo.Customer.TelephoneNumber, editedCustomer.TelephoneNumber);
+            Assert.Equal(fakeRepo.Customer.RequestedDeletion, editedCustomer.RequestedDeletion);
+            Assert.Equal(fakeRepo.Customer.CanPurchase, editedCustomer.CanPurchase);
+            Assert.Equal(fakeRepo.Customer.Active, editedCustomer.Active);
         }
 
         [Fact]
