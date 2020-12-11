@@ -3,14 +3,16 @@ using Customer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Customer.Data.Migrations
 {
     [DbContext(typeof(CustomerDb))]
-    partial class CustomerDbModelSnapshot : ModelSnapshot
+    [Migration("20201211133117_SeedDataUpdated")]
+    partial class SeedDataUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

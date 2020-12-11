@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.Logging;
 using Polly;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Customer.AccountAPI
 {
@@ -39,18 +40,36 @@ namespace Customer.AccountAPI
         public void ConfigureServices(IServiceCollection services)
         {
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            services.AddAuthentication("Bearer")
-            .AddJwtBearer("Bearer", options =>
-            {
-                options.Authority = getCustomerAuthority();
-                options.Audience = "customer_account_api";
-            });
+
+            services.AddAuthentication()
+                .AddJwtBearer("CustomerAuth", options =>
+                {
+                    options.Authority = getCustomerAuthority();
+                    options.Audience = "customer_account_api";
+                })
+                .AddJwtBearer("StaffAuth", options =>
+                    {
+                        options.Authority = "https://localhost:43390";
+                        options.Audience = "customer_account_api";
+                    });
+
             services.AddAuthorization(OptionsBuilderConfigurationExtensions =>
             {
-                OptionsBuilderConfigurationExtensions.AddPolicy("CustomerOnly", builder =>
-                {
-                    builder.RequireClaim("role", "Customer");
-                });
+                OptionsBuilderConfigurationExtensions.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .AddAuthenticationSchemes("CustomerAuth", "StaffAuth")
+                .Build();
+
+                OptionsBuilderConfigurationExtensions.AddPolicy("CustomerOnly", new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .AddAuthenticationSchemes("CustomerAuth")
+                    .RequireClaim("role", "Customer")
+                    .Build());
+                OptionsBuilderConfigurationExtensions.AddPolicy("StaffOnly", new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .AddAuthenticationSchemes("StaffAuth")
+                    .RequireClaim("role", "Staff")
+                    .Build());
             });
 
             services.AddControllers();

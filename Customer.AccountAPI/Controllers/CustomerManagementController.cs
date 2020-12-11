@@ -4,6 +4,7 @@ using Customer.OrderFacade;
 using Customer.OrderFacade.Models;
 using Customer.Repository;
 using Customer.Repository.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ namespace Customer.AccountAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "StaffOnly")]
     public class CustomerManagementController : ControllerBase
     {
         private readonly ILogger<CustomerManagementController> _logger;
@@ -32,15 +34,15 @@ namespace Customer.AccountAPI.Controllers
             _facade = facade;
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Put([FromRoute]int customerId, [FromBody] bool canPurchase)
+        [HttpPut("{customerId}")]
+        public async Task<IActionResult> Put([FromRoute]int customerId, [FromQuery] bool canPurchase)
         {
             var customer = _mapper.Map<CustomerDto>(await _customerRepository.GetCustomer(customerId));
             if (customer == null)
             {
                 return NotFound();
             }
-            if(canPurchase)
+            if (canPurchase)
             {
                 if (customer.Active)
                 {
@@ -71,7 +73,7 @@ namespace Customer.AccountAPI.Controllers
             return NotFound();
         }
 
-        [HttpDelete]
+        [HttpDelete("{customerId}")]
         public async Task<IActionResult> Delete([FromRoute] int customerId)
         {
             if (await _customerRepository.CustomerExists(customerId)
