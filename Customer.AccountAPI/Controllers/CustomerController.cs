@@ -64,6 +64,7 @@ namespace Customer.AccountAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CustomerDto customer)
         {
+            customer.Active = true;
             return await NewOrEditedCustomer(customer);
         }
 

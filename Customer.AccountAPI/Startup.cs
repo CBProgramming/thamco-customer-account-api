@@ -42,7 +42,7 @@ namespace Customer.AccountAPI
             services.AddAuthentication("Bearer")
             .AddJwtBearer("Bearer", options =>
             {
-                options.Authority = getAuthority();
+                options.Authority = getCustomerAuthority();
                 options.Audience = "customer_account_api";
             });
             services.AddAuthorization(OptionsBuilderConfigurationExtensions =>
@@ -121,7 +121,7 @@ namespace Customer.AccountAPI
             });
         }
 
-        private string getAuthority()
+        private string getCustomerAuthority()
         {
             if (Env.IsDevelopment())
             {

@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Customer.UnitTests
 {
-    public class CustomerControllerTests
+    public class CustomerControllerUnitTests
     {
 
         private CustomerDto customerDto;
