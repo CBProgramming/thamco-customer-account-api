@@ -21,6 +21,7 @@ using Polly;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using IdentityModel.Client;
 
 namespace Customer.AccountAPI
 {
@@ -80,18 +81,24 @@ namespace Customer.AccountAPI
                      optionsBuilder.EnableRetryOnFailure(10, TimeSpan.FromSeconds(10), null);
                  }));
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-            if (Env.IsDevelopment())
+            services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
+            services.AddScoped<ProtocolResponse, DiscoveryDocumentResponse>();
+
+
+
+            
+            services.AddHttpClient("CustomerOrderingAPI", client =>
             {
-                services.AddScoped<IOrderFacade, FakeOrderFacade>();
-            }
-            else
+                client.BaseAddress = new Uri("UNKNOWN");
+            })
+                    .AddTransientHttpErrorPolicy(p => p.OrResult(
+                        msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                    .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
+            services.AddHttpClient("StaffAuthServer", client =>
             {
-                services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
-            }
-            string customerOrderingClientName = "CustomerOrderingAPI";
-            services.AddHttpClient(customerOrderingClientName, client =>
-            {
-                client.BaseAddress = new Uri(getUri(customerOrderingClientName));
+                client.BaseAddress = new Uri("https://localhost:43390");
             })
                     .AddTransientHttpErrorPolicy(p => p.OrResult(
                         msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)

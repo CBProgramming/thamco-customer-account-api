@@ -1,6 +1,7 @@
 ﻿using Customer.OrderFacade.Models;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -12,16 +13,35 @@ namespace Customer.OrderFacade
     public class OrderFacade : IOrderFacade
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        
+        private readonly IConfiguration _config;
 
-        public OrderFacade(IHttpClientFactory httpClientFactory)
+        public OrderFacade(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
             _httpClientFactory = httpClientFactory;
+            _config = config;
+        }
+
+        private async Task<HttpClient> GetClientWithAccessToken()
+        {
+            var client = _httpClientFactory.CreateClient("CustomerOrderingAPI");
+            string authServerUrl = _config.GetConnectionString("StaffAuthServerUrl");
+            var disco = await client.GetDiscoveryDocumentAsync(authServerUrl);
+            string clientId = _config.GetConnectionString("ClientId");
+            string clientSecret = _config.GetConnectionString("ClientSecret");
+            var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                Address = disco.TokenEndpoint,
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                Scope = "customer_ordering_api"
+            });
+            client.SetBearerToken(tokenResponse.AccessToken);
+            return client;
         }
 
         public async Task<bool> DeleteCustomer(int customerId)
         {
-            var httpClient = _httpClientFactory.CreateClient("CustomerOrderAPI");
+            HttpClient httpClient = await GetClientWithAccessToken();
             string uri = "/api/Customer/" + customerId;
             if ((await httpClient.DeleteAsync(uri)).IsSuccessStatusCode)
             {
@@ -42,10 +62,7 @@ namespace Customer.OrderFacade
 
         private async Task<bool> UpdateCustomerOrderService(OrderingCustomerDto customer, bool newCustomer)
         {
-            var httpClient = _httpClientFactory.CreateClient("CustomerOrderAPI");
-            /*httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-            {
-            });*/
+            HttpClient httpClient = await GetClientWithAccessToken();
             string uri = "/api/Customer";
             if (newCustomer)
             {
