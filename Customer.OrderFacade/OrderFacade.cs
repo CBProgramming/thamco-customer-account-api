@@ -25,9 +25,9 @@ namespace Customer.OrderFacade
         {
             var client = _httpClientFactory.CreateClient("CustomerOrderingAPI");
             string authServerUrl = _config.GetConnectionString("StaffAuthServerUrl");
-            var disco = await client.GetDiscoveryDocumentAsync(authServerUrl);
-            string clientId = _config.GetConnectionString("ClientId");
             string clientSecret = _config.GetConnectionString("ClientSecret");
+            string clientId = _config.GetConnectionString("ClientId");
+            var disco = await client.GetDiscoveryDocumentAsync(authServerUrl);
             var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
                 Address = disco.TokenEndpoint,

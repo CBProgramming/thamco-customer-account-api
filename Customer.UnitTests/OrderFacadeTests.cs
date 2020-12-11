@@ -60,6 +60,7 @@ namespace Customer.UnitTests
         {
             client = new HttpClient(mockHandler.Object);
             client.BaseAddress = new Uri("http://test");
+            
         }
 
         private void SetupHttpFactoryMock(HttpClient client)
@@ -82,7 +83,7 @@ namespace Customer.UnitTests
                 .Build();
         }
 
-        private void DefaultSetup(HttpStatusCode statusCode)
+        private void DefaultSetupRealHttpClient(HttpStatusCode statusCode)
         {
             SetupCustomer();
             var expectedResult = new HttpResponseMessage
@@ -100,7 +101,7 @@ namespace Customer.UnitTests
         public async Task NewCustomer_OKResult_ShouldReturnTrue()
         {
             //Arrange
-            DefaultSetup(HttpStatusCode.OK);
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer");
 
             //Act
