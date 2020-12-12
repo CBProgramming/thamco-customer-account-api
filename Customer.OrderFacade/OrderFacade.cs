@@ -73,7 +73,7 @@ namespace Customer.OrderFacade
             }
             else
             {
-                uri = uri + customer.CustomerId;
+                uri = uri + "/" + customer.CustomerId;
                 if ((await httpClient.PutAsJsonAsync<OrderingCustomerDto>(uri, customer)).IsSuccessStatusCode)
                 {
                     return true;

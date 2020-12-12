@@ -45,12 +45,12 @@ namespace Customer.AccountAPI
             services.AddAuthentication()
                 .AddJwtBearer("CustomerAuth", options =>
                 {
-                    options.Authority = getCustomerAuthority();
+                    options.Authority = Configuration.GetValue<string>("CustomerAuthServerUrl");
                     options.Audience = "customer_account_api";
                 })
                 .AddJwtBearer("StaffAuth", options =>
                     {
-                        options.Authority = "https://localhost:43390";
+                        options.Authority = Configuration.GetValue<string>("StaffAuthServerUrl");
                         options.Audience = "customer_account_api";
                     });
 
@@ -81,15 +81,21 @@ namespace Customer.AccountAPI
                      optionsBuilder.EnableRetryOnFailure(10, TimeSpan.FromSeconds(10), null);
                  }));
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
+            if (Env.IsDevelopment())
+            {
+                services.AddScoped<IOrderFacade, FakeOrderFacade>();
+            }
+            else
+            {
+                services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
+            }
+            
             services.AddScoped<ProtocolResponse, DiscoveryDocumentResponse>();
 
 
-
-            
             services.AddHttpClient("CustomerOrderingAPI", client =>
             {
-                client.BaseAddress = new Uri("UNKNOWN");
+                client.BaseAddress = new Uri(Configuration.GetValue<string>("CustomerOrderingUrl"));
             })
                     .AddTransientHttpErrorPolicy(p => p.OrResult(
                         msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -98,31 +104,12 @@ namespace Customer.AccountAPI
 
             services.AddHttpClient("StaffAuthServer", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:43390");
+                client.BaseAddress = new Uri(Configuration.GetValue<string>("StaffAuthServerUrl"));
             })
                     .AddTransientHttpErrorPolicy(p => p.OrResult(
                         msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
                     .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
                     .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
-        }
-
-        private string getUri(string clientName)
-        {
-            if (Env.IsDevelopment())
-            {
-               if (clientName.Equals("CustomerOrderingAPI"))
-                {
-                    return "http://localhost:50448";
-                }
-            }
-            else
-            {
-                if (clientName.Equals("CustomerOrderingAPI"))
-                {
-                    return "https://customerorderingthamco.azurewebsites.net";
-                }
-            }
-            return "";
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -145,15 +132,6 @@ namespace Customer.AccountAPI
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private string getCustomerAuthority()
-        {
-            if (Env.IsDevelopment())
-            {
-                return "https://localhost:43389";
-            }
-            return "https://thamcocustomerauth.azurewebsites.net/";
         }
     }
 }
