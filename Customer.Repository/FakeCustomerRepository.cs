@@ -76,11 +76,6 @@ namespace Customer.Repository
             return null;
         }
 
-        public Task<IList<CustomerRepoModel>> GetCustomersRequestingDeletion()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<bool> IsCustomerActive(int customerId)
         {
             return Customer.Active;

@@ -78,14 +78,14 @@ namespace Customer.Repository
                 .FirstOrDefault(c => c.CustomerId == customerId));
         }
 
-        public async Task<IList<CustomerRepoModel>> GetCustomersRequestingDeletion()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<bool> IsCustomerActive(int customerId)
         {
-            return _context.Customers.FirstOrDefault(c => c.CustomerId == customerId).Active;
+            var customer = _context.Customers.FirstOrDefault(c => c.CustomerId == customerId);
+            if (customer != null)
+            {
+                return customer.Active;
+            }
+            return false;
         }
 
         public async Task<bool> MatchingAuthId(int customerId, string authId)
