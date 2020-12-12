@@ -102,14 +102,14 @@ namespace Customer.AccountAPI
                     .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
                     .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 
-            services.AddHttpClient("StaffAuthServer", client =>
+/*            services.AddHttpClient("StaffAuthServer", client =>
             {
                 client.BaseAddress = new Uri(Configuration.GetValue<string>("StaffAuthServerUrl"));
             })
                     .AddTransientHttpErrorPolicy(p => p.OrResult(
                         msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
                     .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
-                    .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+                    .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

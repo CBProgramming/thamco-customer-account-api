@@ -7,9 +7,13 @@ namespace Customer.Data
 {
     public class CustomerDb : DbContext
     {
-        public DbSet<Customer> Customers { get; set; }
+        public virtual DbSet<Customer> Customers { get; set; }
 
         public CustomerDb(DbContextOptions<CustomerDb> options) : base(options)
+        {
+        }
+
+        public CustomerDb()
         {
         }
 

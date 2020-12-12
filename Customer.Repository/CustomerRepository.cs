@@ -33,34 +33,38 @@ namespace Customer.Repository
 
         public async Task<bool> DeleteCustomer(int customerId)
         {
-            return _context.Customers.FirstOrDefault(c => c.CustomerId == customerId).Active;
+            //not implemented, anonymise method used instead
+            return false;
         }
 
         public async Task<bool> EditCustomer(CustomerRepoModel editedCustomer)
         {
             if (editedCustomer != null)
             {
-                var customer = await _context.Customers.FindAsync(editedCustomer.CustomerId);
-                try
+                var customer = _context.Customers.FirstOrDefault(c => c.CustomerId == editedCustomer.CustomerId);
+                if (customer != null)
                 {
-                    customer.GivenName = editedCustomer.GivenName;
-                    customer.FamilyName = editedCustomer.FamilyName;
-                    customer.AddressOne = editedCustomer.AddressOne;
-                    customer.AddressTwo = editedCustomer.AddressTwo;
-                    customer.Town = editedCustomer.Town;
-                    customer.State = editedCustomer.State;
-                    customer.AreaCode = editedCustomer.AreaCode;
-                    customer.Country = editedCustomer.Country;
-                    customer.EmailAddress = editedCustomer.EmailAddress;
-                    customer.TelephoneNumber = editedCustomer.TelephoneNumber;
-                    customer.CanPurchase = editedCustomer.CanPurchase;
-                    customer.Active = editedCustomer.Active;
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
-                catch (DbUpdateConcurrencyException)
-                {
+                    try
+                    {
+                        customer.GivenName = editedCustomer.GivenName;
+                        customer.FamilyName = editedCustomer.FamilyName;
+                        customer.AddressOne = editedCustomer.AddressOne;
+                        customer.AddressTwo = editedCustomer.AddressTwo;
+                        customer.Town = editedCustomer.Town;
+                        customer.State = editedCustomer.State;
+                        customer.AreaCode = editedCustomer.AreaCode;
+                        customer.Country = editedCustomer.Country;
+                        customer.EmailAddress = editedCustomer.EmailAddress;
+                        customer.TelephoneNumber = editedCustomer.TelephoneNumber;
+                        customer.CanPurchase = editedCustomer.CanPurchase;
+                        customer.Active = editedCustomer.Active;
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
 
+                    }
                 }
             }
             return false;
