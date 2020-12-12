@@ -1,5 +1,6 @@
 ﻿using Customer.OrderFacade;
 using Customer.OrderFacade.Models;
+using IdentityModel.Client;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
@@ -19,9 +20,14 @@ namespace Customer.UnitTests
         public OrderingCustomerDto customer;
         public HttpClient client;
         public Mock<IHttpClientFactory> mockFactory;
+        public Mock<HttpClient> mockClient;
         public Mock<HttpMessageHandler> mockHandler;
         public IOrderFacade facade;
         private IConfiguration config;
+        private Mock<Task<DiscoveryDocumentResponse>> mockDisco;
+        private Mock<Task<TokenResponse>> mockTokenResponse;
+        private Task<TokenResponse> tokenResponse;
+        private Mock<DiscoveryDocumentRequest> mockDiscoRequest;
 
 
         private void SetupCustomer()
@@ -56,7 +62,7 @@ namespace Customer.UnitTests
                 .Verifiable();
         }
 
-        private void SetupHttpClient(HttpResponseMessage expected)
+        private void SetupRealHttpClient(HttpResponseMessage expected)
         {
             client = new HttpClient(mockHandler.Object);
             client.BaseAddress = new Uri("http://test");
@@ -72,11 +78,10 @@ namespace Customer.UnitTests
         private void SetupConfig()
         {
             var myConfiguration = new Dictionary<string, string>
-            {
-                {"Key1", "Value1"},
-                {"Nested:Key1", "NestedValue1"},
-                {"Nested:Key2", "NestedValue2"}
-            };
+                        {
+                            {"ConnectionStrings:StaffAuthServerUrl", "https://fakeurl.com"},
+                            {"ConnectionStrings:ClientId", "ClientId"},
+                            {"ConnectionStrings:ClientSecret", "ClientSecret"}};
 
             config = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration)
@@ -91,7 +96,55 @@ namespace Customer.UnitTests
                 StatusCode = statusCode
             };
             SetMockMessageHandler(expectedResult);
-            SetupHttpClient(expectedResult);
+            SetupRealHttpClient(expectedResult);
+            SetupHttpFactoryMock(client);
+            SetupConfig();
+            facade = new OrderFacade.OrderFacade(mockFactory.Object, config);
+            SetupConfig();
+        }
+
+        private void SetupTokenResponse()
+        {
+            SetupRealHttpClient(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK
+            });
+            tokenResponse = client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                Address = "http://fakeendpoint.com",
+                ClientId = "clientId",
+                ClientSecret = "clientSecret",
+                Scope = "customer_ordering_api"
+            });
+
+        }
+
+        private void SetupMockDiscoveryDocument()
+        {
+            mockDisco = new Mock<Task<DiscoveryDocumentResponse>>(MockBehavior.Strict);
+        }
+
+
+        private async void SetupMockHttpClient(HttpResponseMessage expected)
+        {
+            mockClient = new Mock<HttpClient>(MockBehavior.Strict);
+            mockClient.Setup(c => c.GetDiscoveryDocumentAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(mockDisco.Object).Verifiable();
+            mockClient.Setup(c => c.RequestClientCredentialsTokenAsync(It.IsAny<ClientCredentialsTokenRequest>(), It.IsAny<CancellationToken>()))
+                .Returns(tokenResponse).Verifiable();
+            mockClient.Setup(c => c.SetBearerToken(It.IsAny<string>())).Verifiable();
+        }
+
+        private void DefaultSetupMockHttpClient(HttpStatusCode statusCode)
+        {
+            SetupCustomer();
+            var expectedResult = new HttpResponseMessage
+            {
+                StatusCode = statusCode
+            };
+            SetMockMessageHandler(expectedResult);
+            SetupMockDiscoveryDocument();
+            SetupTokenResponse();
+            SetupMockHttpClient(expectedResult);
             SetupHttpFactoryMock(client);
             SetupConfig();
             facade = new OrderFacade.OrderFacade(mockFactory.Object, config);
@@ -116,14 +169,34 @@ namespace Customer.UnitTests
                     && req.RequestUri == expectedUri),
                 ItExpr.IsAny<CancellationToken>());
             mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Once);
+        }
 
+        [Fact]
+        public async Task NewCustomer_OKResult_CheckAllMocks()
+        {
+            //Arrange
+            DefaultSetupMockHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer");
+
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(true == result);
+            mockHandler.Protected().Verify("SendAsync",
+                Times.Once(),
+                ItExpr.Is<HttpRequestMessage>(
+                    req => req.Method == HttpMethod.Post
+                    && req.RequestUri == expectedUri),
+                ItExpr.IsAny<CancellationToken>());
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task NewCustomer_NotFoundResult_ShouldReturnTrue()
         {
             //Arrange
-            DefaultSetup(HttpStatusCode.NotFound);
+            DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
             var expectedUri = new Uri("http://test/api/Customer");
 
             //Act
