@@ -20,7 +20,7 @@
     "Customer.AccountAPI": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "weatherforecast",
+      "launchUrl": "",
       "applicationUrl": "https://localhost:50835",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
