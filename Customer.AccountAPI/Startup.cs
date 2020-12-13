@@ -46,7 +46,7 @@ namespace Customer.AccountAPI
                 .AddJwtBearer("CustomerAuth", options =>
                 {
                     options.Authority = Configuration.GetValue<string>("CustomerAuthServerUrl");
-                    options.Audience = "customer_account_api";
+                    options.Audience = "customer_account_api";                    
                 })
                 .AddJwtBearer("StaffAuth", options =>
                     {
@@ -61,11 +61,18 @@ namespace Customer.AccountAPI
                 .AddAuthenticationSchemes("CustomerAuth", "StaffAuth")
                 .Build();
 
-                OptionsBuilderConfigurationExtensions.AddPolicy("CustomerOnly", new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes("CustomerAuth")
-                    .RequireClaim("role", "Customer")
-                    .Build());
+                /*                OptionsBuilderConfigurationExtensions.AddPolicy("CustomerOnly", new AuthorizationPolicyBuilder()
+                                    .RequireAuthenticatedUser()
+                                    .AddAuthenticationSchemes("CustomerAuth")
+                                    .RequireClaim("role", "Customer")
+                                    .Build());*/
+                OptionsBuilderConfigurationExtensions.AddPolicy("CustomerOnly", policy =>
+                policy.AddAuthenticationSchemes("CustomerAuth")
+                .RequireAssertion(context =>
+                (context.User.HasClaim(c => c.Type == "role" && c.Value == "Customer") 
+                || context.User.HasClaim(c => c.Type == "client_id" && c.Value == "customer_ordering_api")
+                )));
+
                 OptionsBuilderConfigurationExtensions.AddPolicy("StaffOnly", new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("StaffAuth")
