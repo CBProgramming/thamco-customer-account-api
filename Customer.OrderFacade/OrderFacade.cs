@@ -52,32 +52,44 @@ namespace Customer.OrderFacade
 
         public async Task<bool> EditCustomer(OrderingCustomerDto editedCustomer)
         {
-            return await UpdateCustomerOrderService(editedCustomer, false);
+            if (editedCustomer != null)
+            {
+                return await UpdateCustomerOrderService(editedCustomer, false);
+            }
+            return false;
         }
 
         public async Task<bool> NewCustomer(OrderingCustomerDto newCustomer)
         {
-            return await UpdateCustomerOrderService(newCustomer, true);
+            if (newCustomer != null)
+            {
+                return await UpdateCustomerOrderService(newCustomer, true);
+            }
+            return false;
         }
 
         private async Task<bool> UpdateCustomerOrderService(OrderingCustomerDto customer, bool newCustomer)
         {
-            HttpClient httpClient = await GetClientWithAccessToken();
-            string uri = "/api/Customer";
-            if (newCustomer)
+            if (customer != null)
             {
-                if ((await httpClient.PostAsJsonAsync<OrderingCustomerDto>(uri, customer)).IsSuccessStatusCode)
+                HttpClient httpClient = await GetClientWithAccessToken();
+                string uri = "/api/Customer";
+                if (newCustomer)
                 {
-                    return true;
+                    if ((await httpClient.PostAsJsonAsync<OrderingCustomerDto>(uri, customer)).IsSuccessStatusCode)
+                    {
+                        return true;
+                    }
                 }
-            }
-            else
-            {
-                uri = uri + "/" + customer.CustomerId;
-                if ((await httpClient.PutAsJsonAsync<OrderingCustomerDto>(uri, customer)).IsSuccessStatusCode)
+                else
                 {
-                    return true;
+                    uri = uri + "/" + customer.CustomerId;
+                    if ((await httpClient.PutAsJsonAsync<OrderingCustomerDto>(uri, customer)).IsSuccessStatusCode)
+                    {
+                        return true;
+                    }
                 }
+                return false;
             }
             return false;
         }

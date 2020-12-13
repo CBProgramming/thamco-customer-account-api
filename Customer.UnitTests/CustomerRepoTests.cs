@@ -226,6 +226,35 @@ namespace Customer.UnitTests
         }
 
         [Fact]
+        public async Task EditCustomer_Null_ShouldFalse()
+        {
+            //Arrange
+            DefaultSetup();
+
+            //Act
+            var result = await repo.EditCustomer(null);
+
+            //Assert
+            Assert.True(false == result);
+            Assert.NotEqual(dbCustomer.CustomerId, customerRepoModel.CustomerId);
+            Assert.NotEqual(dbCustomer.CustomerAuthId, customerRepoModel.CustomerAuthId);
+            Assert.NotEqual(dbCustomer.GivenName, customerRepoModel.GivenName);
+            Assert.NotEqual(dbCustomer.FamilyName, customerRepoModel.FamilyName);
+            Assert.NotEqual(dbCustomer.AddressOne, customerRepoModel.AddressOne);
+            Assert.NotEqual(dbCustomer.AddressTwo, customerRepoModel.AddressTwo);
+            Assert.NotEqual(dbCustomer.Town, customerRepoModel.Town);
+            Assert.NotEqual(dbCustomer.State, customerRepoModel.State);
+            Assert.NotEqual(dbCustomer.AreaCode, customerRepoModel.AreaCode);
+            Assert.NotEqual(dbCustomer.Country, customerRepoModel.Country);
+            Assert.NotEqual(dbCustomer.EmailAddress, customerRepoModel.EmailAddress);
+            Assert.NotEqual(dbCustomer.TelephoneNumber, customerRepoModel.TelephoneNumber);
+            Assert.Equal(dbCustomer.RequestedDeletion, customerRepoModel.RequestedDeletion);
+            Assert.Equal(dbCustomer.CanPurchase, customerRepoModel.CanPurchase);
+            Assert.Equal(dbCustomer.Active, customerRepoModel.Active);
+            mockDbContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never());
+        }
+
+        [Fact]
         public async Task GetExistingCustomer_ShouldOk()
         {
             //Arrange
@@ -307,6 +336,38 @@ namespace Customer.UnitTests
 
             //Act
             var result = await repo.AnonymiseCustomer(anonymisedCustomer);
+
+            //Assert
+            Assert.True(false == result);
+            Assert.NotEqual(dbCustomer.CustomerId, anonymisedCustomer.CustomerId);
+            Assert.NotEqual(dbCustomer.CustomerAuthId, anonymisedCustomer.CustomerAuthId);
+            Assert.NotEqual(dbCustomer.GivenName, anonymisedCustomer.GivenName);
+            Assert.NotEqual(dbCustomer.FamilyName, anonymisedCustomer.FamilyName);
+            Assert.NotEqual(dbCustomer.AddressOne, anonymisedCustomer.AddressOne);
+            Assert.NotEqual(dbCustomer.AddressTwo, anonymisedCustomer.AddressTwo);
+            Assert.NotEqual(dbCustomer.Town, anonymisedCustomer.Town);
+            Assert.NotEqual(dbCustomer.State, anonymisedCustomer.State);
+            Assert.NotEqual(dbCustomer.AreaCode, anonymisedCustomer.AreaCode);
+            Assert.NotEqual(dbCustomer.Country, anonymisedCustomer.Country);
+            Assert.NotEqual(dbCustomer.EmailAddress, anonymisedCustomer.EmailAddress);
+            Assert.NotEqual(dbCustomer.TelephoneNumber, anonymisedCustomer.TelephoneNumber);
+            Assert.Equal(dbCustomer.RequestedDeletion, anonymisedCustomer.RequestedDeletion);
+            Assert.NotEqual(dbCustomer.CanPurchase, anonymisedCustomer.CanPurchase);
+            Assert.NotEqual(dbCustomer.Active, anonymisedCustomer.Active);
+            mockDbContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never());
+        }
+
+        [Fact]
+        public async Task AnonymiseCustomer_Null_ShouldFalse()
+        {
+            //Arrange
+            DefaultSetup();
+            SetupAnonCustomer();
+            anonymisedCustomer.CustomerAuthId = "something different";
+            anonymisedCustomer.CustomerId = 2;
+
+            //Act
+            var result = await repo.AnonymiseCustomer(null);
 
             //Assert
             Assert.True(false == result);
@@ -454,6 +515,19 @@ namespace Customer.UnitTests
 
             //Act
             var result = await repo.MatchingAuthId(customerRepoModel.CustomerId, dbCustomer.CustomerAuthId);
+
+            //Assert
+            Assert.True(false == result);
+        }
+
+        [Fact]
+        public async Task MatchingAuthId__IdIsNull_ShouldFalse()
+        {
+            //Arrange
+            DefaultSetup();
+
+            //Act
+            var result = await repo.MatchingAuthId(customerRepoModel.CustomerId, null);
 
             //Assert
             Assert.True(false == result);

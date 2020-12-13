@@ -44,15 +44,15 @@ namespace Customer.AccountAPI.Controllers
                 var customer = _mapper.Map<CustomerDto>(await _customerRepository.GetCustomer(customerId));
                 if (customer != null)
                 {
-                    //read from access token
-                    var user = User;
-                    var claims = User.Claims;
-                    var userId = User
-                        .Claims
-                        .FirstOrDefault(c => c.Type == "sub")?.Value;
-                    if (customer.CustomerAuthId == userId)
+                    if (User != null && User.Claims != null)
                     {
-                        return Ok(customer);
+                        string userId = User
+                                        .Claims
+                                        .FirstOrDefault(c => c.Type == "sub")?.Value;
+                        if (userId != null && customer.CustomerAuthId == userId)
+                        {
+                            return Ok(customer);
+                        }
                     }
                     return Forbid();
                 }
@@ -64,76 +64,95 @@ namespace Customer.AccountAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CustomerDto customer)
         {
-            customer.Active = true;
-            return await NewOrEditedCustomer(customer);
+            if(customer != null)
+            {
+                customer.Active = true;
+                return await NewOrEditedCustomer(customer);
+            }
+            return UnprocessableEntity();
         }
 
         // PUT api/<controller>/5
         [HttpPut("{customerId}")]
         public async Task<IActionResult> Put([FromRoute] int customerId, [FromBody] CustomerDto customer)
         {
-            customer.CustomerId = customerId;
-            customer.Active = true;
-            return await NewOrEditedCustomer(customer);
+            if (customer != null)
+            {
+                customer.CustomerId = customerId;
+                customer.Active = true;
+                return await NewOrEditedCustomer(customer);
+            }
+            return UnprocessableEntity();
         }
 
         private async Task<IActionResult> NewOrEditedCustomer(CustomerDto customer)
         {
-            if (!await _customerRepository.CustomerExists(customer.CustomerId))
+            if (customer != null)
             {
-                if (await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
+                if (!await _customerRepository.CustomerExists(customer.CustomerId))
                 {
-                    if(!await _facade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer)));
+                    if (await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                     {
-                        //write to local db to be reattempted later
-                    }
-                    return Ok();
-                }
-            }
-            else
-            {
-                if (await _customerRepository.IsCustomerActive(customer.CustomerId))
-                {
-                    var authId = User
-                                .Claims
-                                .FirstOrDefault(c => c.Type == "sub")?.Value;
-                    if (! await _customerRepository.MatchingAuthId(customer.CustomerId, authId))
-                    {
-                        return Forbid();
-                    }
-                    if (await _customerRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
-                    {
-                        if (!await _facade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                        if (!await _facade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer))) ;
                         {
                             //write to local db to be reattempted later
                         }
                         return Ok();
                     }
                 }
+                else
+                {
+                    if (await _customerRepository.IsCustomerActive(customer.CustomerId))
+                    {
+                        if (User != null && User.Claims != null)
+                        {
+                            var authId = User
+                                    .Claims
+                                    .FirstOrDefault(c => c.Type == "sub")?.Value;
+                            if (authId == null || !await _customerRepository.MatchingAuthId(customer.CustomerId, authId))
+                            {
+                                return Forbid();
+                            }
+                            if (await _customerRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
+                            {
+                                if (!await _facade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                                {
+                                    //write to local db to be reattempted later
+                                }
+                                return Ok();
+                            }
+                        }
+                        return Forbid();
+                    }
+                }
+                return NotFound();
             }
-            return NotFound();
+            return UnprocessableEntity();
         }
 
         // DELETE api/<controller>/5
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> Delete([FromRoute] int customerId)
         {
-            var authId = User
+            if (User != null && User.Claims != null)
+            {
+                var authId = User
                         .Claims
                         .FirstOrDefault(c => c.Type == "sub")?.Value;
-            if (await _customerRepository.MatchingAuthId(customerId, authId))
-            {
-                if (await _customerRepository.CustomerExists(customerId)
-                       && await AnonymiseCustomer(customerId))
+                if (authId != null && await _customerRepository.MatchingAuthId(customerId, authId))
                 {
-                    if (!await _facade.DeleteCustomer(customerId))
+                    if (await _customerRepository.CustomerExists(customerId)
+                           && await AnonymiseCustomer(customerId))
                     {
-                        //write to local db to be reattempted later
+                        if (!await _facade.DeleteCustomer(customerId))
+                        {
+                            //write to local db to be reattempted later
+                        }
+                        return Ok();
                     }
-                    return Ok();
+                    return NotFound();
                 }
-                return NotFound();
-            }
+            }  
             return Forbid();
         }
 

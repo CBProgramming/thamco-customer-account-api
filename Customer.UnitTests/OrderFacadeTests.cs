@@ -207,7 +207,7 @@ namespace Customer.UnitTests
         }
 
         [Fact]
-        public async Task NewCustomer_NotFoundResult_ShouldReturnTrue()
+        public async Task NewCustomer_NotFoundResult_ShouldReturnFalse()
         {
             //Arrange
             DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
@@ -225,6 +225,48 @@ namespace Customer.UnitTests
                     && req.RequestUri == expectedUri),
                 ItExpr.IsAny<CancellationToken>());
             mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task NewCustomer_Null_ShouldReturnFalse()
+        {
+            //Arrange
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer");
+
+            //Act
+            var result = await facade.NewCustomer(null);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync",
+                Times.Never(),
+                ItExpr.Is<HttpRequestMessage>(
+                    req => req.Method == HttpMethod.Post
+                    && req.RequestUri == expectedUri),
+                ItExpr.IsAny<CancellationToken>());
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditCustomer_Null_ShouldReturnFalse()
+        {
+            //Arrange
+            DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
+            var expectedUri = new Uri("http://test/api/Customer");
+
+            //Act
+            var result = await facade.EditCustomer(null);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync",
+                Times.Never(),
+                ItExpr.Is<HttpRequestMessage>(
+                    req => req.Method == HttpMethod.Post
+                    && req.RequestUri == expectedUri),
+                ItExpr.IsAny<CancellationToken>());
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]

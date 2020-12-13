@@ -23,7 +23,11 @@ namespace Customer.Repository
 
         public async Task<bool> AnonymiseCustomer(CustomerRepoModel anonCustomer)
         {
-            return await EditCustomer(anonCustomer);
+            if (anonCustomer != null)
+            {
+                return await EditCustomer(anonCustomer);
+            }
+            return false;
         }
 
         public async Task<bool> CustomerExists(int customerId)
@@ -90,10 +94,14 @@ namespace Customer.Repository
 
         public async Task<bool> MatchingAuthId(int customerId, string authId)
         {
-            var customer = _context.Customers.FirstOrDefault(c => c.CustomerId == customerId);
-            if (customer != null)
+            if (authId != null)
             {
-                return customer.CustomerAuthId.Equals(authId);
+                var customer = _context.Customers.FirstOrDefault(c => c.CustomerId == customerId);
+                if (customer != null)
+                {
+                    return customer.CustomerAuthId.Equals(authId);
+                }
+                return false;
             }
             return false;
         }
