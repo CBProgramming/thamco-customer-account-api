@@ -107,9 +107,12 @@ namespace Customer.AccountAPI.Controllers
                     {
                         if (await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                         {
-                            if (!await _facade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer))) ;
+                            if (clientId != "customer_ordering_api")
                             {
-                                //write to local db to be reattempted later
+                                if (!await _facade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer))) ;
+                                {
+                                    //write to local db to be reattempted later
+                                }
                             }
                             return Ok();
                         }
@@ -128,9 +131,12 @@ namespace Customer.AccountAPI.Controllers
                             {
                                 if (await _customerRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                                 {
-                                    if (!await _facade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                                    if (clientId != "customer_ordering_api")
                                     {
-                                        //write to local db to be reattempted later
+                                        if (!await _facade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                                        {
+                                            //write to local db to be reattempted later
+                                        }
                                     }
                                     return Ok();
                                 }
@@ -157,9 +163,12 @@ namespace Customer.AccountAPI.Controllers
                     if (await _customerRepository.CustomerExists(customerId)
                            && await AnonymiseCustomer(customerId))
                     {
-                        if (!await _facade.DeleteCustomer(customerId))
+                        if (clientId != "customer_ordering_api")
                         {
-                            //write to local db to be reattempted later
+                            if (!await _facade.DeleteCustomer(customerId))
+                            {
+                                //write to local db to be reattempted later
+                            }
                         }
                         return Ok();
                     }
