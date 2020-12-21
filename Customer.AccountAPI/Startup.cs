@@ -76,7 +76,7 @@ namespace Customer.AccountAPI
                 OptionsBuilderConfigurationExtensions.AddPolicy("StaffOnly", new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("StaffAuth")
-                    .RequireClaim("role", "Staff")
+                    .RequireClaim("role", "ManageCustomerAccounts")
                     .Build());
             });
 
