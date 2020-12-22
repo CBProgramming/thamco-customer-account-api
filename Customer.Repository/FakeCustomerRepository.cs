@@ -62,7 +62,6 @@ namespace Customer.Repository
                     Customer = editedCustomer;
                     return true;
                 }
-                else return await NewCustomer(editedCustomer);
             }
             return false;
         }
@@ -81,18 +80,17 @@ namespace Customer.Repository
             return Customer.Active;
         }
 
-        public async Task<bool> NewCustomer(CustomerRepoModel newCustomer)
+        public async Task<int> NewCustomer(CustomerRepoModel newCustomer)
         {
             if (newCustomer != null)
             {
                 if (Customer == null || newCustomer.CustomerId != Customer.CustomerId)
                 {
                     Customer = newCustomer;
-                    return true;
+                    return newCustomer.CustomerId;
                 }
-                else return await EditCustomer(newCustomer);
             }
-            return false;
+            return 0;
         }
 
         public async Task<bool> MatchingAuthId(int customerId, string authId)

@@ -105,7 +105,8 @@ namespace Customer.AccountAPI.Controllers
                     if (clientId != null && (clientId.Equals("customer_ordering_api") 
                         || clientId.Equals("customer_web_app")))
                     {
-                        if (await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
+                        customer.CustomerId = await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer));
+                        if (customer.CustomerId != 0)
                         {
                             if (clientId != "customer_ordering_api")
                             {

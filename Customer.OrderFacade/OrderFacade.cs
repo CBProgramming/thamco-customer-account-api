@@ -24,7 +24,7 @@ namespace Customer.OrderFacade
         private async Task<HttpClient> GetClientWithAccessToken()
         {
             var client = _httpClientFactory.CreateClient("CustomerOrderingAPI");
-            string authServerUrl = _config.GetConnectionString("StaffAuthServerUrl");
+            string authServerUrl = _config.GetConnectionString("CustomerAuthServerUrl");
             string clientSecret = _config.GetConnectionString("ClientSecret");
             string clientId = _config.GetConnectionString("ClientId");
             var disco = await client.GetDiscoveryDocumentAsync(authServerUrl);

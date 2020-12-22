@@ -106,23 +106,24 @@ namespace Customer.Repository
             return false;
         }
 
-        public async Task<bool> NewCustomer(CustomerRepoModel newCustomer)
+        public async Task<int> NewCustomer(CustomerRepoModel newCustomer)
         {
             if (newCustomer != null)
             {
                 try
                 {
+                    newCustomer.CustomerId = 0;
                     var customer = _mapper.Map<Data.Customer>(newCustomer);
                     _context.Add(customer);
                     await _context.SaveChangesAsync();
-                    return true;
+                    return customer.CustomerId;
                 }
                 catch (DbUpdateConcurrencyException)
                 {
 
                 }
             }
-            return false;
+            return 0;
         }
     }
 }
