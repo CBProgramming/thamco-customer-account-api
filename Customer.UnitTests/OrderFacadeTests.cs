@@ -79,9 +79,9 @@ namespace Customer.UnitTests
         {
             var myConfiguration = new Dictionary<string, string>
                         {
-                            {"ConnectionStrings:StaffAuthServerUrl", "https://fakeurl.com"},
-                            {"ConnectionStrings:ClientId", "ClientId"},
-                            {"ConnectionStrings:ClientSecret", "ClientSecret"}};
+                            {"StaffAuthServerUrl", "https://fakeurl.com"},
+                            {"ClientId", "ClientId"},
+                            {"ClientSecret", "ClientSecret"}};
 
             config = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration)

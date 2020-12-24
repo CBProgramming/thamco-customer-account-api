@@ -88,14 +88,14 @@ namespace Customer.AccountAPI
                      optionsBuilder.EnableRetryOnFailure(10, TimeSpan.FromSeconds(10), null);
                  }));
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-            if (Env.IsDevelopment())
+/*            if (Env.IsDevelopment())
             {
                 services.AddScoped<IOrderFacade, FakeOrderFacade>();
             }
             else
-            {
+            {*/
                 services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
-            }
+            //}
             
             services.AddScoped<ProtocolResponse, DiscoveryDocumentResponse>();
 

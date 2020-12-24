@@ -110,7 +110,7 @@ namespace Customer.AccountAPI.Controllers
                         {
                             if (clientId != "customer_ordering_api")
                             {
-                                if (!await _facade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer))) ;
+                                if (!await _facade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
                                 {
                                     //write to local db to be reattempted later
                                 }
