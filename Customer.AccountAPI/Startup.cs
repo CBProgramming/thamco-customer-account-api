@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Customer.OrderFacade;
+using Customer.ReviewFacade;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Logging;
 using Polly;
@@ -95,14 +96,24 @@ namespace Customer.AccountAPI
             else
             {*/
                 services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
+            services.AddScoped<IReviewCustomerFacade, ReviewCustomerFacade>();
             //}
-            
+
             services.AddScoped<ProtocolResponse, DiscoveryDocumentResponse>();
 
 
             services.AddHttpClient("CustomerOrderingAPI", client =>
             {
                 client.BaseAddress = new Uri(Configuration.GetValue<string>("CustomerOrderingUrl"));
+            })
+                    .AddTransientHttpErrorPolicy(p => p.OrResult(
+                        msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                    .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
+            services.AddHttpClient("ReviewAPI", client =>
+            {
+                client.BaseAddress = new Uri(Configuration.GetValue<string>("ReviewUrl"));
             })
                     .AddTransientHttpErrorPolicy(p => p.OrResult(
                         msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)

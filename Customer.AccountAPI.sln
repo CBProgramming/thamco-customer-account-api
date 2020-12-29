@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.AccountAPI", "Cust
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.Data", "Customer.Data\Customer.Data.csproj", "{CD386BC6-8238-42BB-B4D5-9D6BB09FE7C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Repository", "Customer.Repository\Customer.Repository.csproj", "{4EE4D056-3F01-4F89-9F05-0BB8E8BD1895}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.Repository", "Customer.Repository\Customer.Repository.csproj", "{4EE4D056-3F01-4F89-9F05-0BB8E8BD1895}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.OrderFacade", "Customer.OrderFacade\Customer.OrderFacade.csproj", "{CA4AEC37-C612-47A9-AD5A-1D7477BB4F20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.OrderFacade", "Customer.OrderFacade\Customer.OrderFacade.csproj", "{CA4AEC37-C612-47A9-AD5A-1D7477BB4F20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.UnitTests", "Customer.UnitTests\Customer.UnitTests.csproj", "{8D37D44C-FFC5-4073-BB7B-C6440DC68325}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.UnitTests", "Customer.UnitTests\Customer.UnitTests.csproj", "{8D37D44C-FFC5-4073-BB7B-C6440DC68325}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.ReviewFacade", "Customer.ReviewFacade\Customer.ReviewFacade.csproj", "{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{8D37D44C-FFC5-4073-BB7B-C6440DC68325}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D37D44C-FFC5-4073-BB7B-C6440DC68325}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D37D44C-FFC5-4073-BB7B-C6440DC68325}.Release|Any CPU.Build.0 = Release|Any CPU
+		{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Customer.AccountAPI\Customer.AccountAPI.csproj" />
     <ProjectReference Include="..\Customer.Repository\Customer.Repository.csproj" />
+    <ProjectReference Include="..\Customer.ReviewFacade\Customer.ReviewFacade.csproj" />
   </ItemGroup>
 
 </Project>

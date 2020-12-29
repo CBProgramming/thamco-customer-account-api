@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Customer.Data\Customer.Data.csproj" />
     <ProjectReference Include="..\Customer.OrderFacade\Customer.OrderFacade.csproj" />
     <ProjectReference Include="..\Customer.Repository\Customer.Repository.csproj" />
+    <ProjectReference Include="..\Customer.ReviewFacade\Customer.ReviewFacade.csproj" />
   </ItemGroup>
 
 </Project>
