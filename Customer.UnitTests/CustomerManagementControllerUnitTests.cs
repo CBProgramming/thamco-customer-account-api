@@ -128,7 +128,7 @@ namespace Customer.UnitTests
             mockRepo = new Mock<ICustomerRepository>(MockBehavior.Strict);
             mockRepo.Setup(repo => repo.CustomerExists(It.IsAny<int>())).ReturnsAsync(customerExists).Verifiable();
             mockRepo.Setup(repo => repo.IsCustomerActive(It.IsAny<int>())).ReturnsAsync(customerActive).Verifiable();
-            mockRepo.Setup(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(customerDto.CustomerId).Verifiable();
+            mockRepo.Setup(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(succeeds).Verifiable();
             mockRepo.Setup(repo => repo.EditCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(succeeds).Verifiable();
             mockRepo.Setup(repo => repo.MatchingAuthId(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(authMatch).Verifiable();
             mockRepo.Setup(repo => repo.AnonymiseCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(succeeds).Verifiable();

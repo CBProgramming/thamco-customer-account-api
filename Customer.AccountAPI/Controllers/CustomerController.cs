@@ -27,7 +27,7 @@ namespace Customer.AccountAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IOrderFacade _orderFacade;
         private readonly IReviewCustomerFacade _reviewFacade;
-        private string authId, clientId;
+        private string authId, clientId, tokenCustomerId;
 
         public CustomerController(ILogger<CustomerController> logger, ICustomerRepository customerRepository, IMapper mapper, 
             IOrderFacade orderFacade, IReviewCustomerFacade reviewFacade)
@@ -47,6 +47,9 @@ namespace Customer.AccountAPI.Controllers
             clientId = User
                 .Claims
                 .FirstOrDefault(c => c.Type == "client_id")?.Value;
+            tokenCustomerId = User
+                .Claims
+                .FirstOrDefault(c => c.Type == "id")?.Value;
         }
 
         // GET: api/<controller>
@@ -104,20 +107,54 @@ namespace Customer.AccountAPI.Controllers
         {
             if (customer != null)
             {
+                getTokenDetails();
+                int customerId = 0;
+                int.TryParse(tokenCustomerId, out customerId);
+                if (customerId < 1 || (customer.CustomerId != 0 && customerId != customer.CustomerId))
+                {
+                    return NotFound();
+                }
+                customer.CustomerId = customerId;
                 if (!await _customerRepository.CustomerExists(customer.CustomerId))
                 {
-                    getTokenDetails();
-                    if (clientId != null && (clientId.Equals("customer_ordering_api") 
-                        || clientId.Equals("customer_web_app")))
+                    if (await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer))) ;
                     {
-                        customer.CustomerId = await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer));
-                        if (customer.CustomerId != 0)
+                        if (!await _orderFacade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
                         {
-                            if (clientId != "customer_ordering_api")
+                            //write to local db to be reattempted later
+                        }
+                        var reviewCustomer = new ReviewCustomerDto
+                        {
+                            CustomerId = customer.CustomerId,
+                            CustomerAuthId = authId,
+                            CustomerName = customer.GivenName + " " + customer.FamilyName
+                        };
+                        if (!await _reviewFacade.NewCustomer(reviewCustomer))
+                        {
+                            //write to local db to be reattempted later
+                        }
+                    }
+                    return Ok(customer.CustomerId);
+                }
+                else
+                {
+                    if (! await _customerRepository.IsCustomerActive(customer.CustomerId))
+                    {
+                        if (User != null && User.Claims != null)
+                        {
+                            return Forbid();
+                        }
+                        if ((authId != null && customer.CustomerAuthId == authId)
+                            || (clientId != null && clientId.Equals("customer_ordering_api")))
+                        {
+                            if (await _customerRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                             {
-                                if (!await _orderFacade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                                if (clientId != "customer_ordering_api")
                                 {
-                                    //write to local db to be reattempted later
+                                    if (!await _orderFacade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                                    {
+                                        //write to local db to be reattempted later
+                                    }
                                 }
                                 var reviewCustomer = new ReviewCustomerDto
                                 {
@@ -125,47 +162,11 @@ namespace Customer.AccountAPI.Controllers
                                     CustomerAuthId = authId,
                                     CustomerName = customer.GivenName + " " + customer.FamilyName
                                 };
-                                if (!await _reviewFacade.NewCustomer(reviewCustomer))
+                                if (!await _reviewFacade.EditCustomer(reviewCustomer))
                                 {
                                     //write to local db to be reattempted later
                                 }
-                            }
-                            return Ok();
-                        }
-                    }
-
-                }
-                else
-                {
-                    if (await _customerRepository.IsCustomerActive(customer.CustomerId))
-                    {
-                        if (User != null && User.Claims != null)
-                        {
-                            getTokenDetails();
-                            if ((authId != null && customer.CustomerAuthId == authId)
-                                || (clientId != null && clientId.Equals("customer_ordering_api")))
-                            {
-                                if (await _customerRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
-                                {
-                                    if (clientId != "customer_ordering_api")
-                                    {
-                                        if (!await _orderFacade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
-                                        {
-                                            //write to local db to be reattempted later
-                                        }
-                                        var reviewCustomer = new ReviewCustomerDto
-                                        {
-                                            CustomerId = customer.CustomerId,
-                                            CustomerAuthId = authId,
-                                            CustomerName = customer.GivenName + " " + customer.FamilyName
-                                        };
-                                        if (!await _reviewFacade.EditCustomer(reviewCustomer))
-                                        {
-                                            //write to local db to be reattempted later
-                                        }
-                                    }
-                                    return Ok();
-                                }
+                                return Ok();
                             }
                         }
                         return Forbid();

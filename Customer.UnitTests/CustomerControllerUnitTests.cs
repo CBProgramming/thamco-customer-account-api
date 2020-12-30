@@ -133,7 +133,7 @@ namespace Customer.UnitTests
             mockRepo = new Mock<ICustomerRepository>(MockBehavior.Strict);
             mockRepo.Setup(repo => repo.CustomerExists(It.IsAny<int>())).ReturnsAsync(customerExists).Verifiable();
             mockRepo.Setup(repo => repo.IsCustomerActive(It.IsAny<int>())).ReturnsAsync(customerActive).Verifiable();
-            mockRepo.Setup(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(customerDto.CustomerId).Verifiable();
+            mockRepo.Setup(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(succeeds).Verifiable();
             mockRepo.Setup(repo => repo.EditCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(succeeds).Verifiable();
             mockRepo.Setup(repo => repo.MatchingAuthId(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(authMatch).Verifiable();
             mockRepo.Setup(repo => repo.AnonymiseCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(succeeds).Verifiable();
@@ -169,8 +169,9 @@ namespace Customer.UnitTests
                                         new Claim(ClaimTypes.NameIdentifier, "name"),
                                         new Claim(ClaimTypes.Name, "name"),
                                         new Claim(OpenIdConnectConstants.Claims.Subject, "fakeauthid" ),
-                                        new Claim("client_id","customer_web_app")
-                                   }, "TestAuth"));
+                                        new Claim("client_id","customer_web_app"),
+                                        new Claim("id", "1")
+                                   }, "TestAuth"));;;
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext { User = user };
         }

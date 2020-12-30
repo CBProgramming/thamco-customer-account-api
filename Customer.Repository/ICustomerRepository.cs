@@ -9,7 +9,7 @@ namespace Customer.Repository
     {
         public Task<CustomerRepoModel> GetCustomer(int customerId);
 
-        public Task<int> NewCustomer(CustomerRepoModel newCustomer);
+        public Task<bool> NewCustomer(CustomerRepoModel newCustomer);
 
         public Task<bool> EditCustomer(CustomerRepoModel editedCustomer);
 

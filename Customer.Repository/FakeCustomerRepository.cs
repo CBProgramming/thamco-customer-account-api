@@ -80,17 +80,17 @@ namespace Customer.Repository
             return Customer.Active;
         }
 
-        public async Task<int> NewCustomer(CustomerRepoModel newCustomer)
+        public async Task<bool> NewCustomer(CustomerRepoModel newCustomer)
         {
             if (newCustomer != null)
             {
                 if (Customer == null || newCustomer.CustomerId != Customer.CustomerId)
                 {
                     Customer = newCustomer;
-                    return newCustomer.CustomerId;
+                    return true;
                 }
             }
-            return 0;
+            return false;
         }
 
         public async Task<bool> MatchingAuthId(int customerId, string authId)

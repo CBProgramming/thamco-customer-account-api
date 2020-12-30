@@ -29,12 +29,17 @@ namespace Customer.Data
             modelBuilder.HasDefaultSchema("customeraccount");
 
             modelBuilder.Entity<Customer>()
+                .Property(c => c.CustomerId)
+                // key is always provided
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<Customer>()
                 .HasData(
-                    new Customer { CustomerId = 1, CustomerAuthId = "f756701c-4336-47b1-8317-a16e84bd0059", GivenName = "Chris", FamilyName = "Burrell", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "chris@example.com", RequestedDeletion = false, Active = true, CanPurchase = true },
-                    new Customer { CustomerId = 2, CustomerAuthId = "07dc5dfc-9dad-408c-ba81-ff6a8dd3aec2", GivenName = "Paul", FamilyName = "Mitchell", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "paul@example.com", RequestedDeletion = false, Active = true, CanPurchase = true },
-                    new Customer { CustomerId = 3, CustomerAuthId = "1e3998f7-4ca6-42e0-9c78-8cb030f65f47", GivenName = "Jack", FamilyName = "Ferguson", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "jack@example.com", RequestedDeletion = false, Active = true, CanPurchase = true },
-                    new Customer { CustomerId = 4, CustomerAuthId = "bce3bb9c-5947-4265-8a7d-8588655bbabe", GivenName = "Carter", FamilyName = "Ridgeway", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "carter@example.com", RequestedDeletion = false, Active = true, CanPurchase = true },
-                    new Customer { CustomerId = 5, CustomerAuthId = "fb9e3941-6830-4387-be15-eeac14848c01", GivenName = "Karl", FamilyName = "Hall", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "karl@example.com", RequestedDeletion = false, Active = true, CanPurchase = true }
+                    new Customer { CustomerId = 1, CustomerAuthId = "eefbace5-3736-4d56-a683-91172561a528", GivenName = "Chris", FamilyName = "Burrell", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "chris@example.com", RequestedDeletion = false, Active = true, CanPurchase = true },
+                    new Customer { CustomerId = 2, CustomerAuthId = "b9196ae2-1892-49ed-9e29-6b8ebf452eaf", GivenName = "Paul", FamilyName = "Mitchell", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "paul@example.com", RequestedDeletion = false, Active = true, CanPurchase = true },
+                    new Customer { CustomerId = 3, CustomerAuthId = "eb0ecafc-9a27-48b7-b73b-4ead95caeea7", GivenName = "Jack", FamilyName = "Ferguson", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "jack@example.com", RequestedDeletion = false, Active = true, CanPurchase = true },
+                    new Customer { CustomerId = 4, CustomerAuthId = "7bc8e757-11d9-4ecb-8ea8-1f436d8490db", GivenName = "Carter", FamilyName = "Ridgeway", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "carter@example.com", RequestedDeletion = false, Active = true, CanPurchase = true },
+                    new Customer { CustomerId = 5, CustomerAuthId = "722e1945-7ade-46ae-9aa8-06f3c8717bd4", GivenName = "Karl", FamilyName = "Hall", AddressOne = "85 Clifton Road", AreaCode = "DL1 5DS", EmailAddress = "karl@example.com", RequestedDeletion = false, Active = true, CanPurchase = true }
                 );
         }
     }

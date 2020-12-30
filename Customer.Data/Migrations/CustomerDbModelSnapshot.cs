@@ -22,9 +22,7 @@ namespace Customer.Data.Migrations
             modelBuilder.Entity("Customer.Data.Customer", b =>
                 {
                     b.Property<int>("CustomerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
 
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
@@ -80,7 +78,7 @@ namespace Customer.Data.Migrations
                             AddressOne = "85 Clifton Road",
                             AreaCode = "DL1 5DS",
                             CanPurchase = true,
-                            CustomerAuthId = "f756701c-4336-47b1-8317-a16e84bd0059",
+                            CustomerAuthId = "eefbace5-3736-4d56-a683-91172561a528",
                             EmailAddress = "chris@example.com",
                             FamilyName = "Burrell",
                             GivenName = "Chris",
@@ -93,7 +91,7 @@ namespace Customer.Data.Migrations
                             AddressOne = "85 Clifton Road",
                             AreaCode = "DL1 5DS",
                             CanPurchase = true,
-                            CustomerAuthId = "07dc5dfc-9dad-408c-ba81-ff6a8dd3aec2",
+                            CustomerAuthId = "b9196ae2-1892-49ed-9e29-6b8ebf452eaf",
                             EmailAddress = "paul@example.com",
                             FamilyName = "Mitchell",
                             GivenName = "Paul",
@@ -106,7 +104,7 @@ namespace Customer.Data.Migrations
                             AddressOne = "85 Clifton Road",
                             AreaCode = "DL1 5DS",
                             CanPurchase = true,
-                            CustomerAuthId = "1e3998f7-4ca6-42e0-9c78-8cb030f65f47",
+                            CustomerAuthId = "eb0ecafc-9a27-48b7-b73b-4ead95caeea7",
                             EmailAddress = "jack@example.com",
                             FamilyName = "Ferguson",
                             GivenName = "Jack",
@@ -119,7 +117,7 @@ namespace Customer.Data.Migrations
                             AddressOne = "85 Clifton Road",
                             AreaCode = "DL1 5DS",
                             CanPurchase = true,
-                            CustomerAuthId = "bce3bb9c-5947-4265-8a7d-8588655bbabe",
+                            CustomerAuthId = "7bc8e757-11d9-4ecb-8ea8-1f436d8490db",
                             EmailAddress = "carter@example.com",
                             FamilyName = "Ridgeway",
                             GivenName = "Carter",
@@ -132,7 +130,7 @@ namespace Customer.Data.Migrations
                             AddressOne = "85 Clifton Road",
                             AreaCode = "DL1 5DS",
                             CanPurchase = true,
-                            CustomerAuthId = "fb9e3941-6830-4387-be15-eeac14848c01",
+                            CustomerAuthId = "722e1945-7ade-46ae-9aa8-06f3c8717bd4",
                             EmailAddress = "karl@example.com",
                             FamilyName = "Hall",
                             GivenName = "Karl",

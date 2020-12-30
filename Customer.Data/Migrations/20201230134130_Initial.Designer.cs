@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Customer.Data.Migrations
 {
     [DbContext(typeof(CustomerDb))]
-    [Migration("20201207155555_initial")]
-    partial class initial
+    [Migration("20201230134130_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,9 +24,7 @@ namespace Customer.Data.Migrations
             modelBuilder.Entity("Customer.Data.Customer", b =>
                 {
                     b.Property<int>("CustomerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
 
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
@@ -81,10 +79,63 @@ namespace Customer.Data.Migrations
                             Active = true,
                             AddressOne = "85 Clifton Road",
                             AreaCode = "DL1 5DS",
-                            CanPurchase = false,
-                            EmailAddress = "t7145969@live.tees.ac.uk",
+                            CanPurchase = true,
+                            CustomerAuthId = "eefbace5-3736-4d56-a683-91172561a528",
+                            EmailAddress = "chris@example.com",
                             FamilyName = "Burrell",
                             GivenName = "Chris",
+                            RequestedDeletion = false
+                        },
+                        new
+                        {
+                            CustomerId = 2,
+                            Active = true,
+                            AddressOne = "85 Clifton Road",
+                            AreaCode = "DL1 5DS",
+                            CanPurchase = true,
+                            CustomerAuthId = "b9196ae2-1892-49ed-9e29-6b8ebf452eaf",
+                            EmailAddress = "paul@example.com",
+                            FamilyName = "Mitchell",
+                            GivenName = "Paul",
+                            RequestedDeletion = false
+                        },
+                        new
+                        {
+                            CustomerId = 3,
+                            Active = true,
+                            AddressOne = "85 Clifton Road",
+                            AreaCode = "DL1 5DS",
+                            CanPurchase = true,
+                            CustomerAuthId = "eb0ecafc-9a27-48b7-b73b-4ead95caeea7",
+                            EmailAddress = "jack@example.com",
+                            FamilyName = "Ferguson",
+                            GivenName = "Jack",
+                            RequestedDeletion = false
+                        },
+                        new
+                        {
+                            CustomerId = 4,
+                            Active = true,
+                            AddressOne = "85 Clifton Road",
+                            AreaCode = "DL1 5DS",
+                            CanPurchase = true,
+                            CustomerAuthId = "7bc8e757-11d9-4ecb-8ea8-1f436d8490db",
+                            EmailAddress = "carter@example.com",
+                            FamilyName = "Ridgeway",
+                            GivenName = "Carter",
+                            RequestedDeletion = false
+                        },
+                        new
+                        {
+                            CustomerId = 5,
+                            Active = true,
+                            AddressOne = "85 Clifton Road",
+                            AreaCode = "DL1 5DS",
+                            CanPurchase = true,
+                            CustomerAuthId = "722e1945-7ade-46ae-9aa8-06f3c8717bd4",
+                            EmailAddress = "karl@example.com",
+                            FamilyName = "Hall",
+                            GivenName = "Karl",
                             RequestedDeletion = false
                         });
                 });
