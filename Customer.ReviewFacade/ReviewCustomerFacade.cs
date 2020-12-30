@@ -32,7 +32,7 @@ namespace Customer.ReviewFacade
                 Address = disco.TokenEndpoint,
                 ClientId = clientId,
                 ClientSecret = clientSecret,
-                Scope = "customer_review_api"
+                Scope = "review_api"
             });
             client.SetBearerToken(tokenResponse.AccessToken);
             return client;
@@ -56,7 +56,7 @@ namespace Customer.ReviewFacade
                 return false;
             }
             HttpClient httpClient = await GetClientWithAccessToken();
-            string uri = _config.GetSection("ReviewUri").Value + "/" + editedCustomer.CustomerId;
+            string uri = _config.GetSection("ReviewUri").Value;
             if ((await httpClient.PutAsJsonAsync<ReviewCustomerDto>(uri, editedCustomer)).IsSuccessStatusCode)
             {
                 return true;
