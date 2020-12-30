@@ -41,15 +41,18 @@ namespace Customer.AccountAPI.Controllers
 
         private void getTokenDetails()
         {
-            authId = User
+            if (User!= null && User.Claims != null)
+            {
+                authId = User
                 .Claims
                 .FirstOrDefault(c => c.Type == "sub")?.Value;
-            clientId = User
-                .Claims
-                .FirstOrDefault(c => c.Type == "client_id")?.Value;
-            tokenCustomerId = User
-                .Claims
-                .FirstOrDefault(c => c.Type == "id")?.Value;
+                clientId = User
+                    .Claims
+                    .FirstOrDefault(c => c.Type == "client_id")?.Value;
+                tokenCustomerId = User
+                    .Claims
+                    .FirstOrDefault(c => c.Type == "id")?.Value;
+            }
         }
 
         // GET: api/<controller>
@@ -108,16 +111,19 @@ namespace Customer.AccountAPI.Controllers
             if (customer != null)
             {
                 getTokenDetails();
-                int customerId = 0;
-                int.TryParse(tokenCustomerId, out customerId);
-                if (customerId < 1 || (customer.CustomerId != 0 && customerId != customer.CustomerId))
+                if (clientId != null && clientId.Equals("customer_web_app"))
                 {
-                    return NotFound();
+                    int customerId = 0;
+                    int.TryParse(tokenCustomerId, out customerId);
+                    if (customerId < 1 || (customer.CustomerId != 0 && customerId != customer.CustomerId))
+                    {
+                        return NotFound();
+                    }
+                    customer.CustomerId = customerId;
                 }
-                customer.CustomerId = customerId;
                 if (!await _customerRepository.CustomerExists(customer.CustomerId))
                 {
-                    if (await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer))) ;
+                    if (await _customerRepository.NewCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                     {
                         if (!await _orderFacade.NewCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
                         {
@@ -134,16 +140,16 @@ namespace Customer.AccountAPI.Controllers
                             //write to local db to be reattempted later
                         }
                     }
-                    return Ok(customer.CustomerId);
+                    return Ok();
                 }
                 else
                 {
-                    if (! await _customerRepository.IsCustomerActive(customer.CustomerId))
+                    if (await _customerRepository.IsCustomerActive(customer.CustomerId))
                     {
-                        if (User != null && User.Claims != null)
+/*                        if (User != null && User.Claims != null)
                         {
                             return Forbid();
-                        }
+                        }*/
                         if ((authId != null && customer.CustomerAuthId == authId)
                             || (clientId != null && clientId.Equals("customer_ordering_api")))
                         {

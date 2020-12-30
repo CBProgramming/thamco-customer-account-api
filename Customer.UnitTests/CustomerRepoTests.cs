@@ -160,7 +160,7 @@ namespace Customer.UnitTests
             var result = await repo.NewCustomer(null);
 
             //Assert
-            Assert.True(true == result);
+            Assert.True(false == result);
             mockDbContext.Verify(m => m.Add(It.IsAny<Customer.Data.Customer>()), Times.Never()); 
             mockDbContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never());
         }
