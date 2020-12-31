@@ -118,10 +118,14 @@ namespace Customer.AccountAPI.Controllers
                 {
                     int customerId = 0;
                     int.TryParse(tokenCustomerId, out customerId);
-                    if (customerId < 1 || (customer.CustomerId != 0 && customerId != customer.CustomerId)
-                        || authId != customer.CustomerAuthId)
+                    if (customerId < 1 )
                     {
                         return NotFound();
+                    }
+                    if ((customer.CustomerId != 0 && customerId != customer.CustomerId)
+                        || authId != customer.CustomerAuthId)
+                        {
+                        return Forbid();
                     }
                     customer.CustomerId = customerId;
                 }

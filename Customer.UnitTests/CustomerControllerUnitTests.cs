@@ -3,6 +3,7 @@ using AutoMapper;
 using Customer.AccountAPI;
 using Customer.AccountAPI.Controllers;
 using Customer.AccountAPI.Models;
+using Customer.AuthFacade;
 using Customer.OrderFacade;
 using Customer.OrderFacade.Models;
 using Customer.Repository;
@@ -31,8 +32,10 @@ namespace Customer.UnitTests
         private Mock<ICustomerRepository> mockRepo;
         private FakeOrderFacade fakeOrderFacade;
         private FakeReviewCustomerFacade fakeReviewFacade;
+        private FakeAuthFacade fakeAuthFacade;
         private Mock<IOrderFacade> mockOrderFacade;
         private Mock<IReviewCustomerFacade> mockReviewFacade;
+        private Mock<IAuthFacade> mockAuthFacade;
         private IMapper mapper;
         private ILogger<CustomerController> logger;
         private CustomerController controller;
@@ -137,7 +140,7 @@ namespace Customer.UnitTests
             mockRepo.Setup(repo => repo.EditCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(succeeds).Verifiable();
             mockRepo.Setup(repo => repo.MatchingAuthId(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(authMatch).Verifiable();
             mockRepo.Setup(repo => repo.AnonymiseCustomer(It.IsAny<CustomerRepoModel>())).ReturnsAsync(succeeds).Verifiable();
-            if (succeeds)
+            if (succeeds && customerExists)
             {
                 mockRepo.Setup(repo => repo.GetCustomer(It.IsAny<int>())).ReturnsAsync(customerRepoModel).Verifiable();
             }
@@ -161,6 +164,12 @@ namespace Customer.UnitTests
             mockReviewFacade.Setup(facade => facade.NewCustomer(It.IsAny<ReviewCustomerDto>())).ReturnsAsync(succeeds).Verifiable();
             mockReviewFacade.Setup(facade => facade.EditCustomer(It.IsAny<ReviewCustomerDto>())).ReturnsAsync(succeeds).Verifiable();
             mockReviewFacade.Setup(facade => facade.DeleteCustomer(It.IsAny<int>())).ReturnsAsync(succeeds).Verifiable();
+        }
+
+        private void SetMockAuthFacade(bool customerExists = true, bool succeeds = true)
+        {
+            mockAuthFacade = new Mock<IAuthFacade>(MockBehavior.Strict);
+            mockAuthFacade.Setup(facade => facade.DeleteAccount(It.IsAny<string>())).ReturnsAsync(succeeds).Verifiable();
         }
 
         private void SetupUser(CustomerController controller)
@@ -195,6 +204,11 @@ namespace Customer.UnitTests
             fakeReviewFacade = new FakeReviewCustomerFacade();
         }
 
+        private void SetFakeAuthFacade()
+        {
+            fakeAuthFacade = new FakeAuthFacade();
+        }
+
         private void DefaultSetup(bool withMocks = false, bool setupUser = true, bool setupApi = false)
         {
             SetStandardCustomerDto();
@@ -202,18 +216,21 @@ namespace Customer.UnitTests
             SetFakeRepo(customerRepoModel);
             SetFakeOrderFacade();
             SetFakeReviewFacade();
+            SetFakeAuthFacade();
             SetMapper();
             SetLogger();
             SetMockCustomerRepo();
             SetMockOrderFacade();
             SetMockReviewFacade();
+            SetMockAuthFacade();
             if (!withMocks)
             {
-                controller = new CustomerController(logger, fakeRepo, mapper, fakeOrderFacade, fakeReviewFacade);
+                controller = new CustomerController(logger, fakeRepo, mapper, fakeOrderFacade, fakeReviewFacade, fakeAuthFacade);
             }
             else
             {
-                controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+                controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             }
             if (setupUser)
             {
@@ -314,7 +331,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(customerExists: false, customerActive: true, succeeds: true);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             int customerId = 2;
 
             //Act
@@ -351,7 +369,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(customerExists: true, customerActive: false, succeeds: true);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             int customerId = 1;
 
             //Act
@@ -388,7 +407,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo();
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 1;
             customerRepoModel.CustomerAuthId = "officialId";
@@ -411,7 +431,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(succeeds: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 1;
             customerRepoModel.CustomerAuthId = "officialId";
@@ -449,7 +470,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false);
             SetMockCustomerRepo();
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 1;
             customerRepoModel.CustomerAuthId = "officialId";
@@ -504,7 +526,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(customerExists: false, customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -557,7 +580,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo();
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -614,7 +638,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
 
@@ -672,7 +697,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
             editedCustomer.CustomerAuthId = "differentId";
@@ -684,8 +710,8 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as ForbidResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Once);
-            mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Never);
+            mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.MatchingAuthId(editedCustomer.CustomerId, editedCustomer.CustomerAuthId), Times.Never);
@@ -714,7 +740,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
 
@@ -771,7 +798,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false);
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -827,7 +855,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(customerExists: false, customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -880,7 +909,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo();
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -937,7 +967,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
 
@@ -995,7 +1026,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
             customerDto.CustomerAuthId = "differentId";
@@ -1007,8 +1039,8 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as ForbidResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Once);
-            mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Never);
+            mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.MatchingAuthId(editedCustomer.CustomerId, editedCustomer.CustomerAuthId), Times.Never);
@@ -1037,7 +1069,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
 
@@ -1094,7 +1127,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false);
             SetMockCustomerRepo(customerActive: true);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
 
             //Act
             var result = await controller.Put(1, customerDto);
@@ -1154,7 +1188,7 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as OkResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
@@ -1200,7 +1234,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(customerExists: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 2;
 
@@ -1211,7 +1246,7 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as NotFoundResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerId), Times.Never);
             mockRepo.Verify(repo => repo.IsCustomerActive(It.IsAny<int>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
@@ -1257,7 +1292,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -1267,7 +1303,7 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as OkResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
@@ -1314,7 +1350,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 1;
 
@@ -1370,7 +1407,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(setupUser: false, withMocks: true);
             SetMockCustomerRepo(customerActive: true);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
 
             //Act
             var result = await controller.Delete(1);
@@ -1479,7 +1517,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(setupUser: false, setupApi: true, withMocks: true);
             SetMockCustomerRepo(customerExists: false, customerActive: true, succeeds: true);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             int customerId = 2;
 
             //Act
@@ -1516,7 +1555,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(setupUser: false, setupApi: true, withMocks: true);
             SetMockCustomerRepo(customerExists: true, customerActive: false, succeeds: true);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             int customerId = 1;
 
             //Act
@@ -1537,7 +1577,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(setupUser: false, setupApi: true, withMocks: true);
             SetMockCustomerRepo();
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 1;
             customerRepoModel.CustomerAuthId = "officialId";
@@ -1560,7 +1601,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(setupUser: false, setupApi: true, withMocks: true);
             SetMockCustomerRepo(succeeds: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 1;
             customerRepoModel.CustomerAuthId = "officialId";
@@ -1615,7 +1657,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(customerExists: false, customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -1668,7 +1711,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo();
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -1725,7 +1769,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
 
@@ -1751,7 +1796,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
             editedCustomer.CustomerAuthId = "differentId";
@@ -1763,8 +1809,8 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as ForbidResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Once);
-            mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Never);
+            mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.MatchingAuthId(editedCustomer.CustomerId, editedCustomer.CustomerAuthId), Times.Never);
@@ -1793,7 +1839,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
 
@@ -1851,7 +1898,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(customerExists: false, customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -1904,7 +1952,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo();
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -1961,7 +2010,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
 
@@ -2001,7 +2051,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             var editedCustomer = GetEditedDetailsDto();
 
@@ -2064,7 +2115,7 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as OkResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
@@ -2110,7 +2161,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(customerExists: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 2;
 
@@ -2121,7 +2173,7 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as NotFoundResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerId), Times.Never);
             mockRepo.Verify(repo => repo.IsCustomerActive(It.IsAny<int>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
@@ -2167,7 +2219,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -2177,7 +2230,7 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as OkResult;
             Assert.NotNull(objResult);
-            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Once);
+            mockRepo.Verify(repo => repo.CustomerExists(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.IsCustomerActive(customerDto.CustomerId), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
             mockRepo.Verify(repo => repo.NewCustomer(It.IsAny<CustomerRepoModel>()), Times.Never);
@@ -2224,7 +2277,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(withMocks: true, setupUser: false, setupApi: true);
             SetMockCustomerRepo(authMatch: false);
-            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object);
+            controller = new CustomerController(logger, mockRepo.Object, mapper, mockOrderFacade.Object, mockReviewFacade.Object,
+                    mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 1;
 

@@ -75,17 +75,6 @@ namespace Customer.AccountAPI.Controllers
                 {
                     //write to local db top be sent later
                 }
-                var editedCustomer = await _customerRepository.GetCustomer(customer.CustomerId);
-                var reviewCustomer = new ReviewCustomerDto
-                {
-                    CustomerId = editedCustomer.CustomerId,
-                    CustomerAuthId = editedCustomer.CustomerAuthId,
-                    CustomerName = editedCustomer.GivenName + " " + editedCustomer.FamilyName
-                };
-                if (!await _reviewFacade.EditCustomer(reviewCustomer))
-                {
-                    //write to local db to be reattempted later
-                }
                 return Ok();
             }
             return NotFound();
