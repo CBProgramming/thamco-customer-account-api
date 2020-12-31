@@ -23,6 +23,7 @@ using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using IdentityModel.Client;
+using Customer.AuthFacade;
 
 namespace Customer.AccountAPI
 {
@@ -77,7 +78,7 @@ namespace Customer.AccountAPI
                 OptionsBuilderConfigurationExtensions.AddPolicy("StaffOnly", new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("StaffAuth")
-                    .RequireClaim("role", "ManageCustomerAccounts")
+                    //.RequireClaim("role", "ManageCustomerAccounts")
                     .Build());
             });
 
@@ -96,6 +97,7 @@ namespace Customer.AccountAPI
             else
             {*/
                 services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
+            services.AddScoped<IAuthFacade, AuthFacade.AuthFacade>();
             services.AddScoped<IReviewCustomerFacade, ReviewCustomerFacade>();
             //}
 
@@ -114,6 +116,15 @@ namespace Customer.AccountAPI
             services.AddHttpClient("ReviewAPI", client =>
             {
                 client.BaseAddress = new Uri(Configuration.GetValue<string>("ReviewUrl"));
+            })
+                    .AddTransientHttpErrorPolicy(p => p.OrResult(
+                        msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                    .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
+            services.AddHttpClient("AuthAPI", client =>
+            {
+                client.BaseAddress = new Uri(Configuration.GetValue<string>("CustomerAuthServerUrl"));
             })
                     .AddTransientHttpErrorPolicy(p => p.OrResult(
                         msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)

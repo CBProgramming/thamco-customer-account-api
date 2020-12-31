@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Customer.AccountAPI.Models;
+using Customer.AuthFacade;
 using Customer.OrderFacade;
 using Customer.OrderFacade.Models;
 using Customer.Repository;
 using Customer.Repository.Models;
+using Customer.ReviewFacade;
+using Customer.ReviewFacade.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,15 +26,19 @@ namespace Customer.AccountAPI.Controllers
         private readonly ILogger<CustomerManagementController> _logger;
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
-        private readonly IOrderFacade _facade;
+        private readonly IOrderFacade _orderFacade;
+        private readonly IReviewCustomerFacade _reviewFacade;
+        private readonly IAuthFacade _authFacade;
 
         public CustomerManagementController(ILogger<CustomerManagementController> logger, ICustomerRepository customerRepository, 
-            IMapper mapper, IOrderFacade facade)
+            IMapper mapper, IOrderFacade orderFacade, IReviewCustomerFacade reviewFacade, IAuthFacade authFacade)
         {
             _logger = logger;
             _customerRepository = customerRepository;
             _mapper = mapper;
-            _facade = facade;
+            _orderFacade = orderFacade;
+            _reviewFacade = reviewFacade;
+            _authFacade = authFacade;
         }
 
         [HttpPut("{customerId}")]
@@ -64,9 +71,20 @@ namespace Customer.AccountAPI.Controllers
             customer.CanPurchase = canPurchase;
             if (await _customerRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
             {
-                if (!await _facade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
+                if (!await _orderFacade.EditCustomer(_mapper.Map<OrderingCustomerDto>(customer)))
                 {
                     //write to local db top be sent later
+                }
+                var editedCustomer = await _customerRepository.GetCustomer(customer.CustomerId);
+                var reviewCustomer = new ReviewCustomerDto
+                {
+                    CustomerId = editedCustomer.CustomerId,
+                    CustomerAuthId = editedCustomer.CustomerAuthId,
+                    CustomerName = editedCustomer.GivenName + " " + editedCustomer.FamilyName
+                };
+                if (!await _reviewFacade.EditCustomer(reviewCustomer))
+                {
+                    //write to local db to be reattempted later
                 }
                 return Ok();
             }
@@ -76,10 +94,19 @@ namespace Customer.AccountAPI.Controllers
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> Delete([FromRoute] int customerId)
         {
-            if (await _customerRepository.CustomerExists(customerId)
+            var customer = await _customerRepository.GetCustomer(customerId);
+            if (customer != null
                     && await AnonymiseCustomer(customerId))
             {
-                if (!await _facade.DeleteCustomer(customerId))
+                if (!await _orderFacade.DeleteCustomer(customerId))
+                {
+                    //write to local db to be reattempted later
+                }
+                if (!await _reviewFacade.DeleteCustomer(customerId))
+                {
+                    //write to local db to be reattempted later
+                }
+                if (!await _authFacade.DeleteAccount(customer.CustomerAuthId))
                 {
                     //write to local db to be reattempted later
                 }

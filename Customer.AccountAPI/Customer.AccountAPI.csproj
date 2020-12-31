@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Customer.AuthFacade\Customer.AuthFacade.csproj" />
     <ProjectReference Include="..\Customer.Data\Customer.Data.csproj" />
     <ProjectReference Include="..\Customer.OrderFacade\Customer.OrderFacade.csproj" />
     <ProjectReference Include="..\Customer.Repository\Customer.Repository.csproj" />

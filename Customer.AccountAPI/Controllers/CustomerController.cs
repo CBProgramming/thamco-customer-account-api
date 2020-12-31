@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Customer.AccountAPI.Models;
+using Customer.AuthFacade;
 using Customer.OrderFacade;
 using Customer.OrderFacade.Models;
 using Customer.Repository;
@@ -27,16 +28,18 @@ namespace Customer.AccountAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IOrderFacade _orderFacade;
         private readonly IReviewCustomerFacade _reviewFacade;
+        private readonly IAuthFacade _authFacade;
         private string authId, clientId, tokenCustomerId;
 
         public CustomerController(ILogger<CustomerController> logger, ICustomerRepository customerRepository, IMapper mapper, 
-            IOrderFacade orderFacade, IReviewCustomerFacade reviewFacade)
+            IOrderFacade orderFacade, IReviewCustomerFacade reviewFacade, IAuthFacade authFacade)
         {
             _logger = logger;
             _customerRepository = customerRepository;
             _mapper = mapper;
             _orderFacade = orderFacade;
             _reviewFacade = reviewFacade;
+            _authFacade = authFacade;
         }
 
         private void getTokenDetails()
@@ -115,7 +118,8 @@ namespace Customer.AccountAPI.Controllers
                 {
                     int customerId = 0;
                     int.TryParse(tokenCustomerId, out customerId);
-                    if (customerId < 1 || (customer.CustomerId != 0 && customerId != customer.CustomerId))
+                    if (customerId < 1 || (customer.CustomerId != 0 && customerId != customer.CustomerId)
+                        || authId != customer.CustomerAuthId)
                     {
                         return NotFound();
                     }
@@ -194,7 +198,8 @@ namespace Customer.AccountAPI.Controllers
                 if ((authId != null && await _customerRepository.MatchingAuthId(customerId, authId))
                     || (clientId != null && clientId.Equals("customer_ordering_api")))
                 {
-                    if (await _customerRepository.CustomerExists(customerId)
+                    var customer = _mapper.Map<CustomerDto>(await _customerRepository.GetCustomer(customerId));
+                    if (customer != null
                            && await AnonymiseCustomer(customerId))
                     {
                         if (clientId != "customer_ordering_api")
@@ -203,10 +208,14 @@ namespace Customer.AccountAPI.Controllers
                             {
                                 //write to local db to be reattempted later
                             }
-                            if (!await _reviewFacade.DeleteCustomer(customerId))
-                            {
-                                //write to local db to be reattempted later
-                            }
+                        }
+                        if (!await _reviewFacade.DeleteCustomer(customerId))
+                        {
+                            //write to local db to be reattempted later
+                        }
+                        if (! await _authFacade.DeleteAccount(customer.CustomerAuthId))
+                        {
+                            //write to local db to be reattempted later
                         }
                         return Ok();
                     }

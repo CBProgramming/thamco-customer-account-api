@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.OrderFacade", "Cus
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.UnitTests", "Customer.UnitTests\Customer.UnitTests.csproj", "{8D37D44C-FFC5-4073-BB7B-C6440DC68325}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.ReviewFacade", "Customer.ReviewFacade\Customer.ReviewFacade.csproj", "{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.ReviewFacade", "Customer.ReviewFacade\Customer.ReviewFacade.csproj", "{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.AuthFacade", "Customer.AuthFacade\Customer.AuthFacade.csproj", "{DFDCC357-B004-4427-823F-DCF6DD6F0FB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{587DBA5B-4D75-4B18-9018-FAE6A6FFAAF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFDCC357-B004-4427-823F-DCF6DD6F0FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFDCC357-B004-4427-823F-DCF6DD6F0FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFDCC357-B004-4427-823F-DCF6DD6F0FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFDCC357-B004-4427-823F-DCF6DD6F0FB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
