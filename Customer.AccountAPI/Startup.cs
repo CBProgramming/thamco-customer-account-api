@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using IdentityModel.Client;
 using Customer.AuthFacade;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Customer.AccountAPI
 {
@@ -44,7 +45,13 @@ namespace Customer.AccountAPI
         {
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-            services.AddAuthentication()
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer()
                 .AddJwtBearer("CustomerAuth", options =>
                 {
                     options.Authority = Configuration.GetValue<string>("CustomerAuthServerUrl");
