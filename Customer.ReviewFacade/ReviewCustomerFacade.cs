@@ -1,4 +1,5 @@
 ﻿using Customer.ReviewFacade.Models;
+using HttpManager;
 using IdentityModel.Client;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -11,36 +12,18 @@ namespace Customer.ReviewFacade
 {
     public class ReviewCustomerFacade : IReviewCustomerFacade
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
+        private readonly IHttpHandler _handler;
 
-        public ReviewCustomerFacade(IHttpClientFactory httpClientFactory, IConfiguration config)
+        public ReviewCustomerFacade(IConfiguration config, IHttpHandler handler)
         {
-            _httpClientFactory = httpClientFactory;
             _config = config;
-        }
-
-        private async Task<HttpClient> GetClientWithAccessToken()
-        {
-            var client = _httpClientFactory.CreateClient("ReviewAPI");
-            string authServerUrl = _config.GetSection("CustomerAuthServerUrl").Value;
-            string clientSecret = _config.GetSection("ClientSecret").Value;
-            string clientId = _config.GetSection("ClientId").Value;
-            var disco = await client.GetDiscoveryDocumentAsync(authServerUrl);
-            var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-            {
-                Address = disco.TokenEndpoint,
-                ClientId = clientId,
-                ClientSecret = clientSecret,
-                Scope = "review_api"
-            });
-            client.SetBearerToken(tokenResponse.AccessToken);
-            return client;
+            _handler = handler;
         }
 
         public async Task<bool> DeleteCustomer(int customerId)
         {
-            HttpClient httpClient = await GetClientWithAccessToken();
+            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "ReviewAPI", "ReviewScope");
             string uri = _config.GetSection("ReviewUri").Value + "/" + customerId;
             if ((await httpClient.DeleteAsync(uri)).IsSuccessStatusCode)
             {
@@ -55,7 +38,7 @@ namespace Customer.ReviewFacade
             {
                 return false;
             }
-            HttpClient httpClient = await GetClientWithAccessToken();
+            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "ReviewAPI", "ReviewScope");
             string uri = _config.GetSection("ReviewUri").Value;
             if ((await httpClient.PutAsJsonAsync<ReviewCustomerDto>(uri, editedCustomer)).IsSuccessStatusCode)
             {
@@ -70,7 +53,7 @@ namespace Customer.ReviewFacade
             {
                 return false;
             }
-            HttpClient httpClient = await GetClientWithAccessToken();
+            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "ReviewAPI", "ReviewScope");
             string uri = _config.GetSection("ReviewUri").Value;
             if ((await httpClient.PostAsJsonAsync<ReviewCustomerDto>(uri, newCustomer)).IsSuccessStatusCode)
             {

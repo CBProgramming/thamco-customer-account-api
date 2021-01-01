@@ -99,7 +99,7 @@ namespace Customer.UnitTests
             SetupRealHttpClient(expectedResult);
             SetupHttpFactoryMock(client);
             SetupConfig();
-            facade = new OrderFacade.OrderFacade(mockFactory.Object, config);
+            //facade = new OrderFacade.OrderFacade(mockFactory.Object, config);
             SetupConfig();
         }
 

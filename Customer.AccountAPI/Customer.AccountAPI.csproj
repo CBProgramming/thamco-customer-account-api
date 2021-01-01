@@ -30,6 +30,7 @@
     <ProjectReference Include="..\Customer.OrderFacade\Customer.OrderFacade.csproj" />
     <ProjectReference Include="..\Customer.Repository\Customer.Repository.csproj" />
     <ProjectReference Include="..\Customer.ReviewFacade\Customer.ReviewFacade.csproj" />
+    <ProjectReference Include="..\HttpManager\HttpManager.csproj" />
   </ItemGroup>
 
 </Project>

@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Authorization;
 using IdentityModel.Client;
 using Customer.AuthFacade;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using HttpManager;
 
 namespace Customer.AccountAPI
 {
@@ -109,6 +110,9 @@ namespace Customer.AccountAPI
             //}
 
             services.AddScoped<ProtocolResponse, DiscoveryDocumentResponse>();
+
+            services.AddScoped<IHttpHandler, HttpHandler>();
+            services.AddScoped<IAccessTokenGetter, AccessTokenGetter>();
 
 
             services.AddHttpClient("CustomerOrderingAPI", client =>
