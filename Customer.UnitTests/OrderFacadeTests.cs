@@ -185,7 +185,7 @@ namespace Customer.UnitTests
                     //mockClient.Verify(client => client.GetDiscoveryDocumentAsync(ItExpr.IsNull<HttpClient>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
                 }*/
 
-        [Fact]
+/*        [Fact]
         public async Task NewCustomer_OKResult_ShouldReturnTrue()
         {
             //Arrange
@@ -351,6 +351,6 @@ namespace Customer.UnitTests
                     && req.RequestUri == expectedUri),
                 ItExpr.IsAny<CancellationToken>());
             mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Once);
-        }
+        }*/
     }
 }
