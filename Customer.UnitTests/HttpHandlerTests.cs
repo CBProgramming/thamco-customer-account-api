@@ -53,7 +53,6 @@ namespace Customer.UnitTests
                 {"ClientId", clientIdKeyValue},
                 {"ClientSecret", clientSecretKeyValue},
                 { urlKey??"url_key", urlValue},
-                { scopeKey??"scope_key", scopeKeyValue }
             };
             config = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration)
