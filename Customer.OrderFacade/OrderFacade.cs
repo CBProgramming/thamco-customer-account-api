@@ -32,9 +32,18 @@ namespace Customer.OrderFacade
 
         public async Task<bool> DeleteCustomer(int customerId)
         {
-            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, customerOrdseringApi, customerOrdseringScope);
-            string uri = customerUri + customerId;
-            if ((await httpClient.DeleteAsync(uri)).IsSuccessStatusCode)
+            if (!ValidConfigStrings())
+            {
+                return false;
+            }
+            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, 
+                customerOrdseringApi, customerOrdseringScope);
+            if (httpClient == null)
+            {
+                return false;
+            }
+            customerUri = customerUri + customerId;
+            if ((await httpClient.DeleteAsync(customerUri)).IsSuccessStatusCode)
             {
                 return true;
             }
@@ -62,21 +71,20 @@ namespace Customer.OrderFacade
         private async Task<bool> UpdateCustomerOrderService(OrderingCustomerDto customer, bool newCustomer)
         {
             if (customer == null 
-                || string.IsNullOrEmpty(customerAuthUrl) 
-                || string.IsNullOrEmpty(customerOrdseringApi) 
-                || string.IsNullOrEmpty(customerOrdseringScope)
-                || string.IsNullOrEmpty(customerUri))
+                || !ValidConfigStrings())
             {
                 return false;
             }
-            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, customerOrdseringApi, customerOrdseringScope);
+            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, 
+                customerOrdseringApi, customerOrdseringScope);
             if (httpClient == null)
             {
                 return false;
             }
             if (newCustomer)
             {
-                if ((await httpClient.PostAsJsonAsync<OrderingCustomerDto>(customerUri, customer)).IsSuccessStatusCode)
+                if ((await httpClient.PostAsJsonAsync<OrderingCustomerDto>(customerUri, customer))
+                    .IsSuccessStatusCode)
                 {
                     return true;
                 }
@@ -84,13 +92,23 @@ namespace Customer.OrderFacade
             else
             {
                 customerUri = customerUri + customer.CustomerId;
-                if ((await httpClient.PutAsJsonAsync<OrderingCustomerDto>(customerUri, customer)).IsSuccessStatusCode)
+                if ((await httpClient.PutAsJsonAsync<OrderingCustomerDto>(customerUri, customer))
+                    .IsSuccessStatusCode)
                 {
                     return true;
                 }
             }
             return false;
+        }
 
+        private bool ValidConfigStrings()
+        {
+            return !string.IsNullOrEmpty(customerAuthUrl)
+                    && !string.IsNullOrEmpty(customerOrdseringApi)
+                    && !string.IsNullOrEmpty(customerOrdseringScope)
+                    && !string.IsNullOrEmpty(customerUri);
         }
     }
+
+    
 }

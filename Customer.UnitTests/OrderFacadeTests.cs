@@ -30,7 +30,10 @@ namespace Customer.UnitTests
         private Task<TokenResponse> tokenResponse;
         private Mock<DiscoveryDocumentRequest> mockDiscoRequest;
         private Mock<IHttpHandler> mockHttpHandler;
-
+        private string customerUriValue = "/api/Customer/";
+        private string customerAuthServerUrlKeyValue = "CustomerAuthServerUrl";
+        private string customerOrderingApiKeyValue = "CustomerOrderingAPI";
+        private string customerOrderingScopeKeyValue = "CustomerOrderingScope";
 
         private void SetupCustomer()
         {
@@ -77,7 +80,8 @@ namespace Customer.UnitTests
             mockFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(client).Verifiable();
         }
 
-        private void SetupConfig()
+        private void SetupConfig(string custUri = null, string custAuthUrlKey = null, string? custOrderingAPIKey = null, 
+            string? custOrderingScope = null)
         {
             var myConfiguration = new Dictionary<string, string>
             {
@@ -86,16 +90,16 @@ namespace Customer.UnitTests
                 {"CustomerAuthServerUrl", "https://localhost:43389"},
                 {"StaffAuthServerUrl", "https://localhost:43390"},
                 {"CustomerOrderingUrl", "https://localhost:50836"},
-                {"CustomerUri", "/api/Customer/"},
+                {"CustomerUri", custUri??customerUriValue},
                 {"ReviewUrl", "https://localhost:50736"},
                 {"ReviewUri", "/api/CustomerAccount"},
                 {"AuthUri", "/api/users"},
                 {"CustomerAuthCustomerScope", "customer_auth_customer_api"},
                 {"CustomerOrderingScope", "customer_ordering_api"},
                 {"ReviewScope", "review_api"},
-                {"CustomerAuthServerUrlKey", "CustomerAuthServerUrl"},
-                {"CustomerOrderingAPIKey", "CustomerOrderingAPI"},
-                {"CustomerOrderingScopeKey", "CustomerOrderingScope"}
+                {"CustomerAuthServerUrlKey", custAuthUrlKey??customerAuthServerUrlKeyValue},
+                {"CustomerOrderingAPIKey", custOrderingAPIKey??customerOrderingApiKeyValue},
+                {"CustomerOrderingScopeKey", custOrderingScope??customerOrderingScopeKeyValue}
             };
             config = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration)
@@ -158,12 +162,16 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.True(true == result);
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Once(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Post
-                    && req.RequestUri == expectedUri),
-                ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Once);
             mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI", 
                 "CustomerOrderingScope"), Times.Once);
         }
@@ -180,12 +188,14 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.True(false == result);
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Once(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Post
-                    && req.RequestUri == expectedUri),
-                ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI", 
                 "CustomerOrderingScope"), Times.Once);
         }
@@ -202,14 +212,216 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.True(false == result);
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Never(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Post
-                    && req.RequestUri == expectedUri),
-                ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_UriNull_ShouldFalse()
+        {
+            //Arrange
+            customerUriValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/");
+            
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_UriEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerUriValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/");
+
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_AuthKeyNull_ShouldFalse()
+        {
+            //Arrange
+            customerAuthServerUrlKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/");
+
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_AuthKeyEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerAuthServerUrlKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/");
+
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_ApiKeyNull_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingApiKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/");
+
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_ApiKeyEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingApiKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/");
+
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_OrderingScopeNull_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingScopeKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/");
+
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_OrderingScopeEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingScopeKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/");
+
+            //Act
+            var result = await facade.NewCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
         }
 
         [Fact]
@@ -224,17 +436,14 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.True(false == result);
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Never(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Post),
-                ItExpr.IsAny<CancellationToken>());
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Never(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Put
-                    && req.RequestUri == expectedUri),
-                ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -251,17 +460,14 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.True(true == result);
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Never(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Post),
-                ItExpr.IsAny<CancellationToken>());
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Once(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Put
-                    && req.RequestUri == expectedUri),
-                ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
                 "CustomerOrderingScope"), Times.Once);
         }
@@ -278,21 +484,218 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.True(false == result);
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Never(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Post),
-                ItExpr.IsAny<CancellationToken>());
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Once(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Put
-                    && req.RequestUri == expectedUri),
-                ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
                 "CustomerOrderingScope"), Times.Once);
         }
-/*
+
+        [Fact]
+        public async Task EditCustomer_UriNull_ShouldFalse()
+        {
+            //Arrange
+            customerUriValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.EditCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditCustomer_UriEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerUriValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.EditCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditCustomer_AuthKeyNull_ShouldFalse()
+        {
+            //Arrange
+            customerAuthServerUrlKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.EditCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditCustomer_AuthKeyEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerAuthServerUrlKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.EditCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditCustomer_ApiKeyNull_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingApiKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.EditCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditCustomer_ApiKeyEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingApiKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.EditCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditCustomer_OrderingScopeNull_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingScopeKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.EditCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditCustomer_OrderingScopeEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingScopeKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.EditCustomer(customer);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
         [Fact]
         public async Task DeleteCustomer_OKResult_ShouldReturnTrue()
         {
@@ -308,7 +711,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Post),ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
@@ -318,7 +721,7 @@ namespace Customer.UnitTests
         }
 
         [Fact]
-        public async Task DeleteCustomer_NotFoundResult_ShouldReturnTrue()
+        public async Task DeleteCustomer_NotFoundResult_ShouldFalse()
         {
             //Arrange
             DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
@@ -329,13 +732,216 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.True(false == result);
-            mockHandler.Protected().Verify("SendAsync",
-                Times.Once(),
-                ItExpr.Is<HttpRequestMessage>(
-                    req => req.Method == HttpMethod.Delete
-                    && req.RequestUri == expectedUri),
-                ItExpr.IsAny<CancellationToken>());
-            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Once);*/
-        //}
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteCustomer_UriNull_ShouldFalse()
+        {
+            //Arrange
+            customerUriValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.DeleteCustomer(customer.CustomerId);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteCustomer_UriEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerUriValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.DeleteCustomer(customer.CustomerId);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteCustomer_AuthKeyNull_ShouldFalse()
+        {
+            //Arrange
+            customerAuthServerUrlKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.DeleteCustomer(customer.CustomerId);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteCustomer_AuthKeyEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerAuthServerUrlKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.DeleteCustomer(customer.CustomerId);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteCustomer_ApiKeyNull_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingApiKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.DeleteCustomer(customer.CustomerId);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteCustomer_ApiKeyEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingApiKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.DeleteCustomer(customer.CustomerId);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteCustomer_OrderingScopeNull_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingScopeKeyValue = null;
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.DeleteCustomer(customer.CustomerId);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteCustomer_OrderingScopeEmpty_ShouldFalse()
+        {
+            //Arrange
+            customerOrderingScopeKeyValue = "";
+            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            var expectedUri = new Uri("http://test/api/Customer/1");
+
+            //Act
+            var result = await facade.DeleteCustomer(customer.CustomerId);
+
+            //Assert
+            Assert.True(false == result);
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+            mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
+                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+            mockHttpHandler.Verify(m => m.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI",
+                "CustomerOrderingScope"), Times.Never);
+        }
     }
 }
