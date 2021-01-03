@@ -14,18 +14,34 @@ namespace Customer.ReviewFacade
     {
         private readonly IConfiguration _config;
         private readonly IHttpHandler _handler;
+        private string customerAuthUrl;
+        private string customerReviewApi;
+        private string customerReviewScope;
+        private string reviewUri;
 
         public ReviewCustomerFacade(IConfiguration config, IHttpHandler handler)
         {
             _config = config;
             _handler = handler;
+            customerAuthUrl = config.GetSection("CustomerAuthServerUrlKey").Value;
+            customerReviewApi = config.GetSection("CustomerReviewAPIKey").Value;
+            customerReviewScope = config.GetSection("CustomerReviewScopeKey").Value;
+            reviewUri = config.GetSection("ReviewUri").Value;
         }
 
         public async Task<bool> DeleteCustomer(int customerId)
         {
-            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "ReviewAPI", "ReviewScope");
-            string uri = _config.GetSection("ReviewUri").Value + "/" + customerId;
-            if ((await httpClient.DeleteAsync(uri)).IsSuccessStatusCode)
+            if (!ValidConfigStrings())
+            {
+                return false;
+            }
+            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, customerReviewApi, customerReviewScope);
+            if (httpClient == null)
+            {
+                return false;
+            }
+            reviewUri = reviewUri + customerId;
+            if ((await httpClient.DeleteAsync(reviewUri)).IsSuccessStatusCode)
             {
                 return true;
             }
@@ -34,13 +50,17 @@ namespace Customer.ReviewFacade
 
         public async Task<bool> EditCustomer(ReviewCustomerDto editedCustomer)
         {
-            if (editedCustomer == null)
+            if (editedCustomer == null
+                || !ValidConfigStrings())
             {
                 return false;
             }
-            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "ReviewAPI", "ReviewScope");
-            string uri = _config.GetSection("ReviewUri").Value;
-            if ((await httpClient.PutAsJsonAsync<ReviewCustomerDto>(uri, editedCustomer)).IsSuccessStatusCode)
+            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, customerReviewApi, customerReviewScope);
+            if (httpClient == null)
+            {
+                return false;
+            }
+            if ((await httpClient.PutAsJsonAsync<ReviewCustomerDto>(reviewUri, editedCustomer)).IsSuccessStatusCode)
             {
                 return true;
             }
@@ -49,17 +69,29 @@ namespace Customer.ReviewFacade
 
         public async Task<bool> NewCustomer(ReviewCustomerDto newCustomer)
         {
-            if (newCustomer == null)
+            if (newCustomer == null
+                || !ValidConfigStrings())
             {
                 return false;
             }
-            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "ReviewAPI", "ReviewScope");
-            string uri = _config.GetSection("ReviewUri").Value;
-            if ((await httpClient.PostAsJsonAsync<ReviewCustomerDto>(uri, newCustomer)).IsSuccessStatusCode)
+            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, customerReviewApi, customerReviewScope);
+            if (httpClient == null)
+            {
+                return false;
+            }
+            if ((await httpClient.PostAsJsonAsync<ReviewCustomerDto>(reviewUri, newCustomer)).IsSuccessStatusCode)
             {
                 return true;
             }
             return false;
+        }
+
+        private bool ValidConfigStrings()
+        {
+            return !string.IsNullOrEmpty(customerAuthUrl)
+                    && !string.IsNullOrEmpty(customerReviewApi)
+                    && !string.IsNullOrEmpty(customerReviewScope)
+                    && !string.IsNullOrEmpty(reviewUri);
         }
     }
 }
