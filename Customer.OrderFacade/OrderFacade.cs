@@ -15,17 +15,25 @@ namespace Customer.OrderFacade
     {
         private readonly IConfiguration _config;
         private readonly IHttpHandler _handler;
+        private string customerAuthUrl;
+        private string customerOrdseringApi;
+        private string customerOrdseringScope;
+        private string customerUri;
 
         public OrderFacade(IConfiguration config, IHttpHandler handler)
         {
             _config = config;
             _handler = handler;
+            customerAuthUrl = config.GetSection("CustomerAuthServerUrlKey").Value;
+            customerOrdseringApi = config.GetSection("CustomerOrderingAPIKey").Value;
+            customerOrdseringScope = config.GetSection("CustomerOrderingScopeKey").Value;
+            customerUri = config.GetSection("CustomerUri").Value;
         }
 
         public async Task<bool> DeleteCustomer(int customerId)
         {
-            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI", "CustomerOrderingScope");
-            string uri = "/api/Customer/" + customerId;
+            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, customerOrdseringApi, customerOrdseringScope);
+            string uri = customerUri + customerId;
             if ((await httpClient.DeleteAsync(uri)).IsSuccessStatusCode)
             {
                 return true;
@@ -53,28 +61,36 @@ namespace Customer.OrderFacade
 
         private async Task<bool> UpdateCustomerOrderService(OrderingCustomerDto customer, bool newCustomer)
         {
-            if (customer != null)
+            if (customer == null 
+                || string.IsNullOrEmpty(customerAuthUrl) 
+                || string.IsNullOrEmpty(customerOrdseringApi) 
+                || string.IsNullOrEmpty(customerOrdseringScope)
+                || string.IsNullOrEmpty(customerUri))
             {
-                HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "CustomerOrderingAPI", "CustomerOrderingScope");
-                string uri = "/api/Customer";
-                if (newCustomer)
-                {
-                    if ((await httpClient.PostAsJsonAsync<OrderingCustomerDto>(uri, customer)).IsSuccessStatusCode)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    uri = uri + "/" + customer.CustomerId;
-                    if ((await httpClient.PutAsJsonAsync<OrderingCustomerDto>(uri, customer)).IsSuccessStatusCode)
-                    {
-                        return true;
-                    }
-                }
                 return false;
             }
+            HttpClient httpClient = await _handler.GetClient(customerAuthUrl, customerOrdseringApi, customerOrdseringScope);
+            if (httpClient == null)
+            {
+                return false;
+            }
+            if (newCustomer)
+            {
+                if ((await httpClient.PostAsJsonAsync<OrderingCustomerDto>(customerUri, customer)).IsSuccessStatusCode)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                customerUri = customerUri + "/" + customer.CustomerId;
+                if ((await httpClient.PutAsJsonAsync<OrderingCustomerDto>(customerUri, customer)).IsSuccessStatusCode)
+                {
+                    return true;
+                }
+            }
             return false;
+
         }
     }
 }

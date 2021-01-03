@@ -22,7 +22,6 @@ namespace HttpManager
 
         public async Task<HttpClient> GetClient(string urlKey, string clientKey, string scopeKey)
         {
-            //string orderUrl = _config.GetSection("CustomerOrderingUrl").Value;
             string orderUrl = _config.GetSection(urlKey).Value;
             string authServerUrl = _config.GetSection("CustomerAuthServerUrl").Value;
             string clientSecret = _config.GetSection("ClientSecret").Value;
@@ -34,7 +33,6 @@ namespace HttpManager
             {
                 return null;
             }
-            //var client = _httpClientFactory.CreateClient("CustomerOrderingAPI");
             var client = _httpClientFactory.CreateClient(clientKey);
             client = await _tokenGetter.GetToken(client, authServerUrl, clientId, clientSecret, scopeKey);
             return client;
