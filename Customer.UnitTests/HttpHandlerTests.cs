@@ -20,12 +20,10 @@ namespace Customer.UnitTests
         public Mock<HttpMessageHandler> mockHandler;
         public IReviewCustomerFacade facade;
         private IConfiguration config;
-        private Mock<IHttpHandler> mockHttpHandler;
         private string urlKey = "url_key";
         private string urlValue = "url_value";
         private string clientKey = "client_key";
         private string scopeKey = "scope_key";
-        private string customerAuthServerUrlKeyValue = "CustomerAuthServerUrl";
         private string clientSecretKeyValue = "client_secret";
         private string clientIdKeyValue = "client_id";
         private string scopeKeyValue = "scope_key_value";
@@ -54,8 +52,7 @@ namespace Customer.UnitTests
             {
                 {"ClientId", clientIdKeyValue},
                 {"ClientSecret", clientSecretKeyValue},
-                {"CustomerAuthServerUrl", customerAuthServerUrlKeyValue},
-                { urlKey??"url_key", urlValue??"url_value"},
+                { urlKey??"url_key", urlValue},
                 { scopeKey??"scope_key", scopeKeyValue }
             };
             config = new ConfigurationBuilder()
@@ -293,6 +290,108 @@ namespace Customer.UnitTests
         {
             //Arrange
             scopeKey = "";
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+                clientSecretKeyValue, scopeKey), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_NullAuthServerUrlValue()
+        {
+            //Arrange
+            urlValue = null;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+                clientSecretKeyValue, scopeKey), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_EmptyAuthServerUrlValue()
+        {
+            //Arrange
+            urlValue = "";
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+                clientSecretKeyValue, scopeKey), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_NullClientIdValue()
+        {
+            //Arrange
+            clientIdKeyValue = null;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+                clientSecretKeyValue, scopeKey), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_EmptyClientIdValue()
+        {
+            //Arrange
+            clientIdKeyValue = "";
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+                clientSecretKeyValue, scopeKey), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_NullClientSecretValue()
+        {
+            //Arrange
+            clientSecretKeyValue = null;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+                clientSecretKeyValue, scopeKey), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_EmptyClientSecretValue()
+        {
+            //Arrange
+            clientSecretKeyValue = "";
             DefaultSetup();
 
             //Act
