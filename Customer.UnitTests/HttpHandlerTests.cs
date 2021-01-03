@@ -55,7 +55,7 @@ namespace Customer.UnitTests
                 {"ClientId", clientIdKeyValue},
                 {"ClientSecret", clientSecretKeyValue},
                 {"CustomerAuthServerUrl", customerAuthServerUrlKeyValue},
-                {"url_key", urlValue},
+                { urlKey??"url_key", urlValue??"url_value"},
                 { scopeKey??"scope_key", scopeKeyValue }
             };
             config = new ConfigurationBuilder()
@@ -97,7 +97,7 @@ namespace Customer.UnitTests
             Assert.NotNull(objResult);
             Assert.True(client == result);
             mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Once);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+            mockTokenGetter.Verify(t => t.GetToken(client, urlValue, clientIdKeyValue,
                 clientSecretKeyValue, scopeKey), Times.Once);
         }
 
@@ -114,7 +114,7 @@ namespace Customer.UnitTests
             //Assert
             Assert.Null(result);
             mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Once);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+            mockTokenGetter.Verify(t => t.GetToken(client, urlValue, clientIdKeyValue,
                 clientSecretKeyValue, scopeKey), Times.Once);
         }
 
