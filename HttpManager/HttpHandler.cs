@@ -22,19 +22,26 @@ namespace HttpManager
 
         public async Task<HttpClient> GetClient(string urlKey, string clientKey, string scopeKey)
         {
-            string orderUrl = _config.GetSection(urlKey).Value;
-            string authServerUrl = _config.GetSection("CustomerAuthServerUrl").Value;
             string clientSecret = _config.GetSection("ClientSecret").Value;
             string clientId = _config.GetSection("ClientId").Value;
-            if (string.IsNullOrEmpty(authServerUrl)
+            if (string.IsNullOrEmpty(urlKey)
                 || string.IsNullOrEmpty(clientSecret)
                 || string.IsNullOrEmpty(clientId)
-                || string.IsNullOrEmpty(orderUrl))
+                || string.IsNullOrEmpty(clientKey)
+                || string.IsNullOrEmpty(scopeKey))
             {
                 return null;
             }
             var client = _httpClientFactory.CreateClient(clientKey);
-            client = await _tokenGetter.GetToken(client, authServerUrl, clientId, clientSecret, scopeKey);
+            if (client == null)
+            {
+                return null;
+            }
+            client = await _tokenGetter.GetToken(client, urlKey, clientId, clientSecret, scopeKey);
+            if (client == null)
+            {
+                return null;
+            }
             return client;
         }
     }
