@@ -11,7 +11,7 @@ namespace HttpManager
     {
         public async Task<string> GetAccessToken(TokenResponse tokenResponse)
         {
-            return tokenResponse.AccessToken;
+            return tokenResponse!=null?tokenResponse.AccessToken:"";
         }
 
         public Task<DiscoveryDocumentResponse> GetDiscoveryDocumentAsync(HttpClient client, string url)
@@ -21,7 +21,7 @@ namespace HttpManager
 
         public async Task<string> GetTokenEndPoint(DiscoveryDocumentResponse disco)
         {
-            return disco.TokenEndpoint;
+            return disco!=null?disco.TokenEndpoint:"";
         }
 
         public Task<TokenResponse> RequestClientCredentialsTokenAsync(HttpClient client, ClientCredentialsTokenRequest request)

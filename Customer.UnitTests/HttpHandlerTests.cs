@@ -33,25 +33,32 @@ namespace Customer.UnitTests
         private string scopeKeyValue = "scope_key_value";
         private string discoDocumentEndPoint = "disco_end_point";
         private string accessTokenValue = "access_token_value";
+        private readonly string emptyString = "";
         private readonly string originalAddress = "";
         private readonly string originalScope = "";
         private readonly string clientId = "client_id";
         private readonly string clientSecret = "client_secret";
         private HttpHandler httpHandler;
         bool factoryReturnsNull = false;
+        bool wrapperReturnsNullDisco = false;
+        bool wrapperReturnsNullEndPoint = false;
+        bool wrapperReturnsEmptyEndPoint = false;
+        bool wrapperReturnsNullTokenResponse = false;
+        bool wrapperReturnsNullAccessToken = false;
+        bool wrapperReturnsEmptyAccessToken = false;
 
         private void SetupMockWrapper()
         {
             mockWrapper = new Mock<IUnmockablesWrapper>(MockBehavior.Strict);
             mockWrapper.Setup(w => w.GetDiscoveryDocumentAsync(It.IsAny<HttpClient>(),It.IsAny<string>()))
-                .Returns(null ?? Task.FromResult(mockDiscoResponse.Object)).Verifiable();
+                .Returns(wrapperReturnsNullDisco?null:Task.FromResult(mockDiscoResponse.Object)).Verifiable();
             mockWrapper.Setup(w => w.RequestClientCredentialsTokenAsync(
                 It.IsAny<HttpClient>(), It.IsAny<ClientCredentialsTokenRequest>()))
-                .Returns(Task.FromResult(mockTokenResponse.Object)).Verifiable();
+                .Returns(wrapperReturnsNullTokenResponse?null:Task.FromResult(mockTokenResponse.Object)).Verifiable();
             mockWrapper.Setup(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()))
-                .Returns(Task.FromResult(discoDocumentEndPoint));
+                .Returns(Task.FromResult(wrapperReturnsNullEndPoint?null:(wrapperReturnsEmptyEndPoint?"":discoDocumentEndPoint)));
             mockWrapper.Setup(w => w.GetAccessToken(It.IsAny<TokenResponse>()))
-                .Returns(Task.FromResult(accessTokenValue));
+                .Returns(Task.FromResult(wrapperReturnsNullAccessToken?null:(wrapperReturnsEmptyAccessToken?"":accessTokenValue)));
         }
 
         private void SetupClientCredentialsTokenRequest()
@@ -119,7 +126,108 @@ namespace Customer.UnitTests
             Assert.Equal(tokenRequest.ClientSecret, clientSecret);
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(httpClient, tokenRequest), Times.Once());
             mockWrapper.Verify(w => w.GetTokenEndPoint(mockDiscoResponse.Object), Times.Once());
+            mockWrapper.Verify(w => w.GetAccessToken(mockTokenResponse.Object), Times.Once());
             Assert.Equal(httpClient.DefaultRequestHeaders.Authorization.Parameter, accessTokenValue);
+        }
+
+        [Fact]
+        public async Task GetClient_NullClientFactory()
+        {
+            //Arrange
+            DefaultSetup();
+            httpHandler = new HttpHandler(null, config, tokenRequest, mockWrapper.Object);
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(It.IsAny<string>()), Times.Never);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(It.IsAny<HttpClient>(), It.IsAny<string>()), Times.Never());
+            Assert.Equal(tokenRequest.Address, originalAddress);
+            Assert.Equal(tokenRequest.Scope, originalScope);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
+                It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_NullConfig()
+        {
+            //Arrange
+            DefaultSetup();
+            httpHandler = new HttpHandler(mockFactory.Object, null, tokenRequest, mockWrapper.Object);
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(It.IsAny<string>()), Times.Never);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(It.IsAny<HttpClient>(), It.IsAny<string>()), Times.Never());
+            Assert.Equal(tokenRequest.Address, originalAddress);
+            Assert.Equal(tokenRequest.Scope, originalScope);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
+                It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_NullTokenRequest()
+        {
+            //Arrange
+            DefaultSetup();
+            httpHandler = new HttpHandler(mockFactory.Object, config, null, mockWrapper.Object);
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(It.IsAny<string>()), Times.Never);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(It.IsAny<HttpClient>(), It.IsAny<string>()), Times.Never());
+            Assert.Equal(tokenRequest.Address, originalAddress);
+            Assert.Equal(tokenRequest.Scope, originalScope);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
+                It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_NullWrapper()
+        {
+            //Arrange
+            DefaultSetup();
+            httpHandler = new HttpHandler(mockFactory.Object, config, tokenRequest, null);
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(It.IsAny<string>()), Times.Never);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(It.IsAny<HttpClient>(), It.IsAny<string>()), Times.Never());
+            Assert.Equal(tokenRequest.Address, originalAddress);
+            Assert.Equal(tokenRequest.Scope, originalScope);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
+                It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
@@ -143,11 +251,157 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(), 
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_NullUrlKey()
+        public async Task NewCustomer_WrapperReturnsNullDisco()
+        {
+            //Arrange
+            wrapperReturnsNullDisco = true;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(clientKey), Times.Once);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(httpClient, config.GetSection(urlKey).Value), Times.Once());
+            Assert.Equal(tokenRequest.Address, originalAddress);
+            Assert.Equal(tokenRequest.Scope, originalScope);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
+                It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_WrapperReturnsNullEndPoint()
+        {
+            //Arrange
+            wrapperReturnsNullEndPoint = true;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(clientKey), Times.Once);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(httpClient, config.GetSection(urlKey).Value), Times.Once());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(mockDiscoResponse.Object), Times.Once());
+            Assert.Equal(tokenRequest.Address, originalAddress);
+            Assert.Equal(tokenRequest.Scope, originalScope);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(httpClient, tokenRequest), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_WrapperReturnsEmptyEndPoint()
+        {
+            //Arrange
+            wrapperReturnsEmptyEndPoint = true;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(clientKey), Times.Once);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(httpClient, config.GetSection(urlKey).Value), Times.Once());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(mockDiscoResponse.Object), Times.Once());
+            Assert.Equal(tokenRequest.Address, originalAddress);
+            Assert.Equal(tokenRequest.Scope, originalScope);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(httpClient, tokenRequest), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_WrapperReturnsNullTokenResponse()
+        {
+            //Arrange
+            wrapperReturnsNullTokenResponse = true;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(clientKey), Times.Once);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(httpClient, config.GetSection(urlKey).Value), Times.Once());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(mockDiscoResponse.Object), Times.Once());
+            Assert.Equal(tokenRequest.Address, discoDocumentEndPoint);
+            Assert.Equal(tokenRequest.Scope, scopeKeyValue);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(httpClient, tokenRequest), Times.Once());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_WrapperReturnsNullAccessToken()
+        {
+            //Arrange
+            wrapperReturnsNullAccessToken = true;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(clientKey), Times.Once);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(httpClient, config.GetSection(urlKey).Value), Times.Once());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(mockDiscoResponse.Object), Times.Once());
+            Assert.Equal(tokenRequest.Address, discoDocumentEndPoint);
+            Assert.Equal(tokenRequest.Scope, scopeKeyValue);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(httpClient, tokenRequest), Times.Once());
+            mockWrapper.Verify(w => w.GetAccessToken(mockTokenResponse.Object), Times.Once());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_WrapperReturnsEmptyAccessToken()
+        {
+            //Arrange
+            wrapperReturnsEmptyAccessToken = true;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(f => f.CreateClient(clientKey), Times.Once);
+            mockWrapper.Verify(w => w.GetDiscoveryDocumentAsync(httpClient, config.GetSection(urlKey).Value), Times.Once());
+            mockWrapper.Verify(w => w.GetTokenEndPoint(mockDiscoResponse.Object), Times.Once());
+            Assert.Equal(tokenRequest.Address, discoDocumentEndPoint);
+            Assert.Equal(tokenRequest.Scope, scopeKeyValue);
+            Assert.Equal(tokenRequest.ClientId, clientId);
+            Assert.Equal(tokenRequest.ClientSecret, clientSecret);
+            mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(httpClient, tokenRequest), Times.Once());
+            mockWrapper.Verify(w => w.GetAccessToken(mockTokenResponse.Object), Times.Once());
+            Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
+        }
+
+        [Fact]
+        public async Task GetClient_NullUrlKey()
         {
             //Arrange
             urlKey = null;
@@ -167,11 +421,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_EmptyUrlKey()
+        public async Task GetClient_EmptyUrlKey()
         {
             //Arrange
             urlKey = "";
@@ -191,11 +446,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_NullClientKey()
+        public async Task GetClient_NullClientKey()
         {
             //Arrange
             clientKey = null;
@@ -215,11 +471,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_EmptyClientKey()
+        public async Task GetClient_EmptyClientKey()
         {
             //Arrange
             clientKey = "";
@@ -239,11 +496,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_NullScopeKey()
+        public async Task GetClient_NullScopeKey()
         {
             //Arrange
             scopeKey = null;
@@ -263,11 +521,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_EmptyScopeKey()
+        public async Task GetClient_EmptyScopeKey()
         {
             //Arrange
             scopeKey = "";
@@ -287,11 +546,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_NullAuthServerUrlValue()
+        public async Task GetClient_NullAuthServerUrlValue()
         {
             //Arrange
             urlValue = null;
@@ -311,11 +571,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_EmptyAuthServerUrlValue()
+        public async Task GetClient_EmptyAuthServerUrlValue()
         {
             //Arrange
             urlValue = "";
@@ -335,11 +596,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_NullScopeKeyValue()
+        public async Task GetClient_NullScopeKeyValue()
         {
             //Arrange
             scopeKeyValue = null;
@@ -359,11 +621,12 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
 
         [Fact]
-        public async Task NewCustomer_EmptyScopeKeyValue()
+        public async Task GetClient_EmptyScopeKeyValue()
         {
             //Arrange
             scopeKeyValue = "";
@@ -383,6 +646,7 @@ namespace Customer.UnitTests
             mockWrapper.Verify(w => w.RequestClientCredentialsTokenAsync(It.IsAny<HttpClient>(),
                 It.IsAny<ClientCredentialsTokenRequest>()), Times.Never());
             mockWrapper.Verify(w => w.GetTokenEndPoint(It.IsAny<DiscoveryDocumentResponse>()), Times.Never());
+            mockWrapper.Verify(w => w.GetAccessToken(It.IsAny<TokenResponse>()), Times.Never());
             Assert.Null(httpClient.DefaultRequestHeaders.Authorization);
         }
     }
