@@ -99,16 +99,16 @@ namespace Customer.UnitTests
                 .Returns(Task.FromResult(endPointAddress)).Verifiable();
         }
 
-        private void DefaultSetup()
+/*        private void DefaultSetup()
         {
-            /*var expectedResult = new HttpResponseMessage
+            *//*var expectedResult = new HttpResponseMessage
             {
                 StatusCode = statusCode
-            };*/
+            };*//*
             //SetMockMessageHandler(expectedResult);
             SetupMockHttpClient();
             SetupDiscoGetterMock();
             accessTokenGetter = new AccessTokenGetter(mockDiscoGetter.Object);
-        }
+        }*/
     }
 }

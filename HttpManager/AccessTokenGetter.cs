@@ -11,21 +11,19 @@ namespace HttpManager
     public class AccessTokenGetter : IAccessTokenGetter
     {
         private readonly IDiscoGetter _discoGetter;
+        private readonly ClientCredentialsTokenRequest _tokenRequest;
 
-        public AccessTokenGetter(IDiscoGetter discoGetter)
+        public AccessTokenGetter(IDiscoGetter discoGetter, ClientCredentialsTokenRequest tokenRequest)
         {
             _discoGetter = discoGetter;
+            _tokenRequest = tokenRequest;
         }
-        public async Task<HttpClient> GetToken(HttpClient client, string authUrl, string clientId, string clientSecret, string scope)
+        public async Task<HttpClient> GetToken(HttpClient client, string authUrl, string scope)
         {
             var disco = await client.GetDiscoveryDocumentAsync(authUrl);
-            var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-            {
-                Address = await _discoGetter.GetTokenEndPoint(disco),
-                ClientId = clientId,
-                ClientSecret = clientSecret,
-                Scope = scope
-            });
+            _tokenRequest.Address = await _discoGetter.GetTokenEndPoint(disco);
+            _tokenRequest.Scope = scope;
+            var tokenResponse = await client.RequestClientCredentialsTokenAsync(_tokenRequest);
             client.SetBearerToken(tokenResponse.AccessToken);
             return client;
         }

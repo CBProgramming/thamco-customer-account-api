@@ -5,6 +5,6 @@ namespace HttpManager
 {
     public interface IAccessTokenGetter
     {
-        Task<HttpClient> GetToken(HttpClient client, string authUrl, string clientId, string clientSecret, string scopeKey);
+        Task<HttpClient> GetToken(HttpClient client, string authUrl, string scopeKey);
     }
 }

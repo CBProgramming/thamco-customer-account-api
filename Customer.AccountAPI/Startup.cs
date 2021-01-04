@@ -115,6 +115,13 @@ namespace Customer.AccountAPI
             services.AddScoped<IAccessTokenGetter, AccessTokenGetter>();
             services.AddScoped<IDiscoGetter, DiscoGetter>();
 
+            services.AddSingleton(new ClientCredentialsTokenRequest
+            {
+                Address = "",
+                ClientId = Configuration.GetValue<string>("ClientId"),
+                ClientSecret = Configuration.GetValue<string>("ClientSecret"),
+                Scope = ""
+            });
 
             services.AddHttpClient("CustomerOrderingAPI", client =>
             {

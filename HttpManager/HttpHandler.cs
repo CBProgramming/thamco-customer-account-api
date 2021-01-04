@@ -27,12 +27,8 @@ namespace HttpManager
                 return null;
             }
             string authServerUrl = _config.GetSection(urlKey).Value;
-            string clientSecret = _config.GetSection("ClientSecret").Value;
-            string clientId = _config.GetSection("ClientId").Value;
             string scope = _config.GetSection(scopeKey).Value;
-            if (string.IsNullOrEmpty(clientSecret)
-                || string.IsNullOrEmpty(clientId)
-                || string.IsNullOrEmpty(clientKey)
+            if (string.IsNullOrEmpty(clientKey)
                 || string.IsNullOrEmpty(scope)
                 || string.IsNullOrEmpty(authServerUrl))
             {
@@ -43,7 +39,7 @@ namespace HttpManager
             {
                 return null;
             }
-            client = await _tokenGetter.GetToken(client, authServerUrl, clientId, clientSecret, scope);
+            client = await _tokenGetter.GetToken(client, authServerUrl, scope);
             if (client == null)
             {
                 return null;

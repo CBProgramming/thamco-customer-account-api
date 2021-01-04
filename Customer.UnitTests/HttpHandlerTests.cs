@@ -14,18 +14,14 @@ namespace Customer.UnitTests
 {
     public class HttpHandlerTests
     {
-        public HttpClient client;
+        public Mock<HttpClient> client;
         public Mock<IHttpClientFactory> mockFactory;
-        public Mock<HttpClient> mockClient;
-        public Mock<HttpMessageHandler> mockHandler;
         public IReviewCustomerFacade facade;
         private IConfiguration config;
         private string urlKey = "url_key";
         private string urlValue = "url_value";
         private string clientKey = "client_key";
         private string scopeKey = "scope_key";
-        private string clientSecretKeyValue = "client_secret";
-        private string clientIdKeyValue = "client_id";
         private string scopeKeyValue = "scope_key_value";
         private HttpHandler httpHandler;
         private Mock<IAccessTokenGetter> mockTokenGetter;
@@ -34,8 +30,7 @@ namespace Customer.UnitTests
 
         private void SetupRealHttpClient()
         {
-            client = new HttpClient();
-            client.BaseAddress = new Uri("http://test");
+            client = new Mock<HttpClient>();
         }
 
         private void SetupHttpFactoryMock(HttpClient client)
@@ -49,8 +44,6 @@ namespace Customer.UnitTests
         {
             var myConfiguration = new Dictionary<string, string>
             {
-                {"ClientId", clientIdKeyValue},
-                {"ClientSecret", clientSecretKeyValue},
                 { urlKey??"url_key", urlValue},
                 { scopeKey??"scope_key", scopeKeyValue }
             };
@@ -63,22 +56,22 @@ namespace Customer.UnitTests
         {
             mockTokenGetter = new Mock<IAccessTokenGetter>(MockBehavior.Strict);
             mockTokenGetter.Setup(f => f.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), 
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(Task.FromResult(tokenGetterReturnsNull?null:client)).Verifiable();
+                It.IsAny<string>()))
+                .Returns(Task.FromResult(tokenGetterReturnsNull?null:client.Object)).Verifiable();
         }
 
         private void DefaultSetup()
         {
             //SetMockMessageHandler(expectedResult);
             SetupRealHttpClient();
-            SetupHttpFactoryMock(client);
+            SetupHttpFactoryMock(client.Object);
             SetupConfig();
             SetupMockTokenGetter();
             httpHandler = new HttpHandler(mockFactory.Object, config, mockTokenGetter.Object);
             SetupConfig();
         }
 
-/*        [Fact]
+        [Fact]
         public async Task GetClient_ShouldReturnClient()
         {
             //Arrange
@@ -91,10 +84,9 @@ namespace Customer.UnitTests
             Assert.NotNull(result);
             var objResult = result as HttpClient;
             Assert.NotNull(objResult);
-            Assert.True(client == result);
+            Assert.True(client.Object == result);
             mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Once);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlValue, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Once);
+            mockTokenGetter.Verify(t => t.GetToken(client.Object, urlValue, scopeKeyValue), Times.Once);
         }
 
         [Fact]
@@ -110,9 +102,8 @@ namespace Customer.UnitTests
             //Assert
             Assert.Null(result);
             mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Once);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlValue, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Once);
-        }*/
+            mockTokenGetter.Verify(t => t.GetToken(client.Object, urlValue, scopeKeyValue), Times.Once);
+        }
 
         [Fact]
         public async Task NewCustomer_FactoryReturnsNull()
@@ -127,76 +118,7 @@ namespace Customer.UnitTests
             //Assert
             Assert.Null(result);
             mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Once);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
-        }
-
-        [Fact]
-        public async Task NewCustomer_NullClientSecret()
-        {
-            //Arrange
-            clientSecretKeyValue = null;
-            DefaultSetup();
-
-            //Act
-            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
-
-            //Assert
-            Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
-        }
-
-        [Fact]
-        public async Task NewCustomer_EmptyClientSecret()
-        {
-            //Arrange
-            clientSecretKeyValue = "";
-            DefaultSetup();
-
-            //Act
-            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
-
-            //Assert
-            Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
-        }
-
-        [Fact]
-        public async Task NewCustomer_NullClientId()
-        {
-            //Arrange
-            clientIdKeyValue = null;
-            DefaultSetup();
-
-            //Act
-            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
-
-            //Assert
-            Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
-        }
-
-        [Fact]
-        public async Task NewCustomer_EmptyClientId()
-        {
-            //Arrange
-            clientIdKeyValue = "";
-            DefaultSetup();
-
-            //Act
-            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
-
-            //Assert
-            Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -211,9 +133,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -228,9 +149,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -245,9 +165,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -262,9 +181,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -279,9 +197,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -296,9 +213,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -313,9 +229,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -330,77 +245,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
-        }
-
-        [Fact]
-        public async Task NewCustomer_NullClientIdValue()
-        {
-            //Arrange
-            clientIdKeyValue = null;
-            DefaultSetup();
-
-            //Act
-            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
-
-            //Assert
-            Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
-        }
-
-        [Fact]
-        public async Task NewCustomer_EmptyClientIdValue()
-        {
-            //Arrange
-            clientIdKeyValue = "";
-            DefaultSetup();
-
-            //Act
-            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
-
-            //Assert
-            Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
-        }
-
-        [Fact]
-        public async Task NewCustomer_NullClientSecretValue()
-        {
-            //Arrange
-            clientSecretKeyValue = null;
-            DefaultSetup();
-
-            //Act
-            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
-
-            //Assert
-            Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
-        }
-
-        [Fact]
-        public async Task NewCustomer_EmptyClientSecretValue()
-        {
-            //Arrange
-            clientSecretKeyValue = "";
-            DefaultSetup();
-
-            //Act
-            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
-
-            //Assert
-            Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -415,9 +261,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -432,9 +277,8 @@ namespace Customer.UnitTests
 
             //Assert
             Assert.Null(result);
-            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
-            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
-                clientSecretKeyValue, scopeKey), Times.Never);
+            mockFactory.Verify(factory => factory.CreateClient(It.IsAny<string>()), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
     }
 }
