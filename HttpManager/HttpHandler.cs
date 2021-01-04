@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IdentityModel.Client;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -11,13 +12,16 @@ namespace HttpManager
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
-        private readonly IAccessTokenGetter _tokenGetter;
+        private readonly ClientCredentialsTokenRequest _tokenRequest;
+        private readonly IUnmockablesWrapper _unmockablesWrapper;
 
-        public HttpHandler(IHttpClientFactory httpClientFactory, IConfiguration config, IAccessTokenGetter tokenGetter)
+        public HttpHandler(IHttpClientFactory httpClientFactory, IConfiguration config,
+            ClientCredentialsTokenRequest tokenRequest, IUnmockablesWrapper unmockablesWrapper)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;
-            _tokenGetter = tokenGetter;
+            _tokenRequest = tokenRequest;
+            _unmockablesWrapper = unmockablesWrapper;
         }
 
         public async Task<HttpClient> GetClient(string urlKey, string clientKey, string scopeKey)
@@ -39,11 +43,18 @@ namespace HttpManager
             {
                 return null;
             }
-            client = await _tokenGetter.GetToken(client, authServerUrl, scope);
+            /*client = await _tokenGetter.GetToken(client, authServerUrl, scope);
             if (client == null)
             {
                 return null;
-            }
+            }*/
+            var disco = await _unmockablesWrapper.GetDiscoveryDocumentAsync(client,authServerUrl);
+            _tokenRequest.Address = await _unmockablesWrapper.GetTokenEndPoint(disco);
+            _tokenRequest.Scope = scope;
+            var tokenResponse = await _unmockablesWrapper
+                .RequestClientCredentialsTokenAsync(client, _tokenRequest);
+            var accessToken = await _unmockablesWrapper.GetAccessToken(tokenResponse);
+            client.SetBearerToken(accessToken);
             return client;
         }
     }

@@ -112,8 +112,7 @@ namespace Customer.AccountAPI
             services.AddScoped<ProtocolResponse, DiscoveryDocumentResponse>();
 
             services.AddScoped<IHttpHandler, HttpHandler>();
-            services.AddScoped<IAccessTokenGetter, AccessTokenGetter>();
-            services.AddScoped<IDiscoGetter, DiscoGetter>();
+            services.AddScoped<IUnmockablesWrapper, UnmockablesWrapper>();
 
             services.AddSingleton(new ClientCredentialsTokenRequest
             {
