@@ -36,7 +36,6 @@ namespace Customer.UnitTests
         {
             client = new HttpClient();
             client.BaseAddress = new Uri("http://test");
-
         }
 
         private void SetupHttpFactoryMock(HttpClient client)

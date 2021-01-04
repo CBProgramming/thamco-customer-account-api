@@ -162,6 +162,8 @@ namespace Customer.AccountAPI.Controllers
                         if ((authId != null && customer.CustomerAuthId == authId)
                             || (clientId != null && clientId.Equals("customer_ordering_api")))
                         {
+                            var customerModel = _mapper.Map<CustomerDto>(await _customerRepository.GetCustomer(customer.CustomerId));
+                            customer.CanPurchase = customerModel.CanPurchase;
                             if (await _customerRepository.EditCustomer(_mapper.Map<CustomerRepoModel>(customer)))
                             {
                                 if (clientId != "customer_ordering_api")
