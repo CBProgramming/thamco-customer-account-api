@@ -113,6 +113,7 @@ namespace Customer.AccountAPI
 
             services.AddScoped<IHttpHandler, HttpHandler>();
             services.AddScoped<IAccessTokenGetter, AccessTokenGetter>();
+            services.AddScoped<IDiscoGetter, DiscoGetter>();
 
 
             services.AddHttpClient("CustomerOrderingAPI", client =>

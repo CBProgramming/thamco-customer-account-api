@@ -53,6 +53,7 @@ namespace Customer.UnitTests
                 {"ClientId", clientIdKeyValue},
                 {"ClientSecret", clientSecretKeyValue},
                 { urlKey??"url_key", urlValue},
+                { scopeKey??"scope_key", scopeKeyValue }
             };
             config = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration)
@@ -78,7 +79,7 @@ namespace Customer.UnitTests
             SetupConfig();
         }
 
-        [Fact]
+/*        [Fact]
         public async Task GetClient_ShouldReturnClient()
         {
             //Arrange
@@ -112,7 +113,7 @@ namespace Customer.UnitTests
             mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Once);
             mockTokenGetter.Verify(t => t.GetToken(client, urlValue, clientIdKeyValue,
                 clientSecretKeyValue, scopeKey), Times.Once);
-        }
+        }*/
 
         [Fact]
         public async Task NewCustomer_FactoryReturnsNull()
@@ -391,6 +392,40 @@ namespace Customer.UnitTests
         {
             //Arrange
             clientSecretKeyValue = "";
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+                clientSecretKeyValue, scopeKey), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_NullScopeKeyValue()
+        {
+            //Arrange
+            scopeKeyValue = null;
+            DefaultSetup();
+
+            //Act
+            var result = await httpHandler.GetClient(urlKey, clientKey, scopeKey);
+
+            //Assert
+            Assert.Null(result);
+            mockFactory.Verify(factory => factory.CreateClient(clientKey), Times.Never);
+            mockTokenGetter.Verify(t => t.GetToken(client, urlKey, clientIdKeyValue,
+                clientSecretKeyValue, scopeKey), Times.Never);
+        }
+
+        [Fact]
+        public async Task NewCustomer_EmptyScopeKeyValue()
+        {
+            //Arrange
+            scopeKeyValue = "";
             DefaultSetup();
 
             //Act

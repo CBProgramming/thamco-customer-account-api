@@ -10,21 +10,21 @@ namespace HttpManager
 {
     public class AccessTokenGetter : IAccessTokenGetter
     {
-        private readonly IConfiguration _config;
+        private readonly IDiscoGetter _discoGetter;
 
-        public AccessTokenGetter(IConfiguration config)
+        public AccessTokenGetter(IDiscoGetter discoGetter)
         {
-            _config = config;
+            _discoGetter = discoGetter;
         }
-        public async Task<HttpClient> GetToken(HttpClient client, string authUrl, string clientId, string clientSecret, string scopeKey)
+        public async Task<HttpClient> GetToken(HttpClient client, string authUrl, string clientId, string clientSecret, string scope)
         {
             var disco = await client.GetDiscoveryDocumentAsync(authUrl);
             var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
-                Address = disco.TokenEndpoint,
+                Address = await _discoGetter.GetTokenEndPoint(disco),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
-                Scope = _config.GetSection(scopeKey).Value
+                Scope = scope
             });
             client.SetBearerToken(tokenResponse.AccessToken);
             return client;

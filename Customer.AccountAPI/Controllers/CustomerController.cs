@@ -91,6 +91,7 @@ namespace Customer.AccountAPI.Controllers
             if(customer != null)
             {
                 customer.Active = true;
+                customer.CanPurchase = true;
                 return await NewOrEditedCustomer(customer);
             }
             return UnprocessableEntity();

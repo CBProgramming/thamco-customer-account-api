@@ -22,18 +22,18 @@ namespace HttpManager
 
         public async Task<HttpClient> GetClient(string urlKey, string clientKey, string scopeKey)
         {
-            if (urlKey == null)
+            if (string.IsNullOrEmpty(urlKey) || string.IsNullOrEmpty(scopeKey))
             {
                 return null;
             }
             string authServerUrl = _config.GetSection(urlKey).Value;
             string clientSecret = _config.GetSection("ClientSecret").Value;
             string clientId = _config.GetSection("ClientId").Value;
-            if (string.IsNullOrEmpty(urlKey)
-                || string.IsNullOrEmpty(clientSecret)
+            string scope = _config.GetSection(scopeKey).Value;
+            if (string.IsNullOrEmpty(clientSecret)
                 || string.IsNullOrEmpty(clientId)
                 || string.IsNullOrEmpty(clientKey)
-                || string.IsNullOrEmpty(scopeKey)
+                || string.IsNullOrEmpty(scope)
                 || string.IsNullOrEmpty(authServerUrl))
             {
                 return null;
@@ -43,7 +43,7 @@ namespace HttpManager
             {
                 return null;
             }
-            client = await _tokenGetter.GetToken(client, authServerUrl, clientId, clientSecret, scopeKey);
+            client = await _tokenGetter.GetToken(client, authServerUrl, clientId, clientSecret, scope);
             if (client == null)
             {
                 return null;
