@@ -27,8 +27,8 @@ namespace Customer.UnitTests
         private Mock<IHttpHandler> mockHttpHandler;
         private string reviewUriValue = "/api/CustomerAccount/";
         private string customerAuthServerUrlKeyValue = "CustomerAuthServerUrl";
-        private string customerReviewApiKeyValue = "CustomerReviewAPI";
-        private string customerReviewScopeKeyValue = "CustomerReviewScope";
+        private string customerReviewApiKeyValue = "ReviewAPI";
+        private string customerReviewScopeKeyValue = "ReviewScope";
 
         private void SetupCustomer()
         {
@@ -82,8 +82,8 @@ namespace Customer.UnitTests
                 {"CustomerOrderingScope", "customer_ordering_api"},
                 {"ReviewScope", "review_api"},
                 {"CustomerAuthServerUrlKey", custAuthUrlKey??customerAuthServerUrlKeyValue},
-                {"CustomerReviewAPIKey", custReviewAPIKey??customerReviewApiKeyValue},
-                {"CustomerReviewScopeKey", custReviewScope??customerReviewScopeKeyValue}
+                {"ReviewAPIKey", custReviewAPIKey??customerReviewApiKeyValue},
+                {"ReviewScopeKey", custReviewScope??customerReviewScopeKeyValue}
             };
             config = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration)

@@ -24,8 +24,8 @@ namespace Customer.ReviewFacade
             if (config != null)
             {
                 customerAuthUrl = config.GetSection("CustomerAuthServerUrlKey").Value;
-                customerReviewApi = config.GetSection("CustomerReviewAPIKey").Value;
-                customerReviewScope = config.GetSection("CustomerReviewScopeKey").Value;
+                customerReviewApi = config.GetSection("ReviewAPIKey").Value;
+                customerReviewScope = config.GetSection("ReviewScopeKey").Value;
                 reviewUri = config.GetSection("ReviewUri").Value;
             }
         }
