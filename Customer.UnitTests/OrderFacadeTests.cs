@@ -130,7 +130,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             DefaultSetupRealHttpClient(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/Customer");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -156,7 +156,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/Customer");
 
             //Act
             var result = await facade.NewCustomer(customer);

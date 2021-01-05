@@ -43,7 +43,7 @@ namespace Customer.OrderFacade
             {
                 return false;
             }
-            customerUri = customerUri + customerId;
+            customerUri = customerUri + "/" + customerId;
             if ((await httpClient.DeleteAsync(customerUri)).IsSuccessStatusCode)
             {
                 return true;
