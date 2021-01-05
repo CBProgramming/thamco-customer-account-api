@@ -118,7 +118,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -128,11 +128,11 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                  (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Post && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(customerAuthServerUrlKeyValue, customerReviewApiKeyValue,
                 customerReviewScopeKeyValue), Times.Once);
         }
@@ -142,7 +142,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             DefaultSetup(HttpStatusCode.NotFound);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -152,11 +152,11 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                  (req => req.Method == HttpMethod.Get), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Post && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(customerAuthServerUrlKeyValue, customerReviewApiKeyValue,
                 customerReviewScopeKeyValue), Times.Once);
         }
@@ -166,7 +166,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer");
+            var expectedUri = new Uri("http://test/api/CustomerAccount");
 
             //Act
             var result = await facade.NewCustomer(null);
@@ -180,7 +180,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -191,7 +191,7 @@ namespace Customer.UnitTests
             //Arrange
             reviewUriValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -205,7 +205,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -216,7 +216,7 @@ namespace Customer.UnitTests
             //Arrange
             reviewUriValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -230,7 +230,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -241,7 +241,7 @@ namespace Customer.UnitTests
             //Arrange
             customerAuthServerUrlKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -255,7 +255,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -266,7 +266,7 @@ namespace Customer.UnitTests
             //Arrange
             customerAuthServerUrlKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -280,7 +280,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -291,7 +291,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewApiKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -305,7 +305,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -316,7 +316,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewApiKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -330,7 +330,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                  It.IsAny<string>()), Times.Never);
         }
@@ -341,7 +341,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewScopeKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -355,7 +355,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -366,7 +366,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewScopeKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.NewCustomer(customer);
@@ -380,7 +380,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -390,7 +390,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             DefaultSetup(HttpStatusCode.NotFound);
-            var expectedUri = new Uri("http://test/api/Customer");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.EditCustomer(null);
@@ -404,7 +404,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -414,7 +414,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -426,9 +426,9 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Post), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Put && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(customerAuthServerUrlKeyValue, customerReviewApiKeyValue,
                 customerReviewScopeKeyValue), Times.Once);
         }
@@ -438,7 +438,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             DefaultSetup(HttpStatusCode.NotFound);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -452,7 +452,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(customerAuthServerUrlKeyValue, customerReviewApiKeyValue,
                 customerReviewScopeKeyValue), Times.Once);
         }
@@ -463,7 +463,7 @@ namespace Customer.UnitTests
             //Arrange
             reviewUriValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -477,7 +477,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -488,7 +488,7 @@ namespace Customer.UnitTests
             //Arrange
             reviewUriValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -502,7 +502,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -513,7 +513,7 @@ namespace Customer.UnitTests
             //Arrange
             customerAuthServerUrlKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -527,7 +527,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -538,7 +538,7 @@ namespace Customer.UnitTests
             //Arrange
             customerAuthServerUrlKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -552,7 +552,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -563,7 +563,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewApiKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -577,7 +577,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -588,7 +588,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewApiKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -602,7 +602,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -613,7 +613,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewScopeKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -627,7 +627,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -638,7 +638,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewScopeKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.EditCustomer(customer);
@@ -652,7 +652,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -700,7 +700,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Once(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(customerAuthServerUrlKeyValue, customerReviewApiKeyValue,
                 customerReviewScopeKeyValue), Times.Once);
         }
@@ -725,7 +725,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -750,7 +750,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -761,7 +761,7 @@ namespace Customer.UnitTests
             //Arrange
             customerAuthServerUrlKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.DeleteCustomer(customer.CustomerId);
@@ -775,7 +775,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -786,7 +786,7 @@ namespace Customer.UnitTests
             //Arrange
             customerAuthServerUrlKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.DeleteCustomer(customer.CustomerId);
@@ -800,7 +800,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -811,7 +811,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewApiKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.DeleteCustomer(customer.CustomerId);
@@ -825,7 +825,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                  It.IsAny<string>()), Times.Never);
         }
@@ -836,7 +836,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewApiKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.DeleteCustomer(customer.CustomerId);
@@ -850,7 +850,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -861,7 +861,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewScopeKeyValue = null;
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.DeleteCustomer(customer.CustomerId);
@@ -875,7 +875,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }
@@ -886,7 +886,7 @@ namespace Customer.UnitTests
             //Arrange
             customerReviewScopeKeyValue = "";
             DefaultSetup(HttpStatusCode.OK);
-            var expectedUri = new Uri("http://test/api/Customer/1");
+            var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
             var result = await facade.DeleteCustomer(customer.CustomerId);
@@ -900,7 +900,7 @@ namespace Customer.UnitTests
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
                 (req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>());
             mockHandler.Protected().Verify("SendAsync", Times.Never(), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Delete && req.RequestUri == expectedUri), ItExpr.IsAny<CancellationToken>());
+                (req => req.Method == HttpMethod.Delete), ItExpr.IsAny<CancellationToken>());
             mockHttpHandler.Verify(m => m.GetClient(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>()), Times.Never);
         }

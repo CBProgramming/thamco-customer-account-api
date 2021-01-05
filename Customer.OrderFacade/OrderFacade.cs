@@ -15,7 +15,7 @@ namespace Customer.OrderFacade
     {
         private readonly IHttpHandler _handler;
         private string customerAuthUrl;
-        private string customerOrdseringApi;
+        private string customerOrderingApi;
         private string customerOrdseringScope;
         private string customerUri;
 
@@ -25,7 +25,7 @@ namespace Customer.OrderFacade
             if (config != null)
             {
                 customerAuthUrl = config.GetSection("CustomerAuthServerUrlKey").Value;
-                customerOrdseringApi = config.GetSection("CustomerOrderingAPIKey").Value;
+                customerOrderingApi = config.GetSection("CustomerOrderingAPIKey").Value;
                 customerOrdseringScope = config.GetSection("CustomerOrderingScopeKey").Value;
                 customerUri = config.GetSection("CustomerUri").Value;
             }
@@ -38,7 +38,7 @@ namespace Customer.OrderFacade
                 return false;
             }
             HttpClient httpClient = await _handler.GetClient(customerAuthUrl, 
-                customerOrdseringApi, customerOrdseringScope);
+                customerOrderingApi, customerOrdseringScope);
             if (httpClient == null)
             {
                 return false;
@@ -77,7 +77,7 @@ namespace Customer.OrderFacade
                 return false;
             }
             HttpClient httpClient = await _handler.GetClient(customerAuthUrl, 
-                customerOrdseringApi, customerOrdseringScope);
+                customerOrderingApi, customerOrdseringScope);
             if (httpClient == null)
             {
                 return false;
@@ -105,7 +105,7 @@ namespace Customer.OrderFacade
         private bool ValidConfigStrings()
         {
             return !string.IsNullOrEmpty(customerAuthUrl)
-                    && !string.IsNullOrEmpty(customerOrdseringApi)
+                    && !string.IsNullOrEmpty(customerOrderingApi)
                     && !string.IsNullOrEmpty(customerOrdseringScope)
                     && !string.IsNullOrEmpty(customerUri);
         }
