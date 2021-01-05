@@ -26,7 +26,7 @@ namespace Customer.UnitTests
         public IOrderFacade facade;
         private IConfiguration config;
         private Mock<IHttpHandler> mockHttpHandler;
-        private string customerUriValue = "/api/Customer/";
+        private string customerUriValue = "/api/Customer";
         private string customerAuthServerUrlKeyValue = "CustomerAuthServerUrl";
         private string customerOrderingApiKeyValue = "CustomerOrderingAPI";
         private string customerOrderingScopeKeyValue = "CustomerOrderingScope";
