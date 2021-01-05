@@ -11,22 +11,31 @@ namespace HttpManager
     {
         public async Task<string> GetAccessToken(TokenResponse tokenResponse)
         {
-            return tokenResponse!=null?tokenResponse.AccessToken:"";
+            return tokenResponse!=null?
+                tokenResponse.AccessToken:
+                "";
         }
 
         public Task<DiscoveryDocumentResponse> GetDiscoveryDocumentAsync(HttpClient client, string url)
         {
-            return HttpClientDiscoveryExtensions.GetDiscoveryDocumentAsync(client, url);
+            return string.IsNullOrEmpty(url)?
+                null:
+                HttpClientDiscoveryExtensions.GetDiscoveryDocumentAsync(client, url);
         }
 
         public async Task<string> GetTokenEndPoint(DiscoveryDocumentResponse disco)
         {
-            return disco!=null?disco.TokenEndpoint:"";
+            return disco!=null?
+                disco.TokenEndpoint:
+                "";
         }
 
-        public Task<TokenResponse> RequestClientCredentialsTokenAsync(HttpClient client, ClientCredentialsTokenRequest request)
+        public Task<TokenResponse> RequestClientCredentialsTokenAsync(HttpClient client, 
+            ClientCredentialsTokenRequest request)
         {
-            return HttpClientTokenRequestExtensions.RequestClientCredentialsTokenAsync(client, request);
+            return request==null?
+                null:
+                HttpClientTokenRequestExtensions.RequestClientCredentialsTokenAsync(client, request);
         }
     }
 }
