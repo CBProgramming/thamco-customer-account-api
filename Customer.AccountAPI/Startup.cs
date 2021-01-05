@@ -122,7 +122,7 @@ namespace Customer.AccountAPI
                 Scope = ""
             });
 
-            services.AddHttpClient("CustomerOrderingAPI", client =>
+            services.AddHttpClient(Configuration.GetValue<string>("CustomerOrderingAPIKey"), client =>
             {
                 client.BaseAddress = new Uri(Configuration.GetValue<string>("CustomerOrderingUrl"));
             })
@@ -131,7 +131,7 @@ namespace Customer.AccountAPI
                     .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
                     .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 
-            services.AddHttpClient("ReviewAPI", client =>
+            services.AddHttpClient(Configuration.GetValue<string>("ReviewAPIKey"), client =>
             {
                 client.BaseAddress = new Uri(Configuration.GetValue<string>("ReviewUrl"));
             })
@@ -140,7 +140,7 @@ namespace Customer.AccountAPI
                     .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
                     .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 
-            services.AddHttpClient("AuthAPI", client =>
+            services.AddHttpClient(Configuration.GetValue<string>("AuthAPIKey"), client =>
             {
                 client.BaseAddress = new Uri(Configuration.GetValue<string>("CustomerAuthServerUrl"));
             })

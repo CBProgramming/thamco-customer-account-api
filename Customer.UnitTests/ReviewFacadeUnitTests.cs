@@ -97,7 +97,7 @@ namespace Customer.UnitTests
                 .Returns(Task.FromResult(client)).Verifiable();
         }
 
-        private void DefaultSetupRealHttpClient(HttpStatusCode statusCode)
+        private void DefaultSetup(HttpStatusCode statusCode)
         {
             SetupCustomer();
             var expectedResult = new HttpResponseMessage
@@ -117,7 +117,7 @@ namespace Customer.UnitTests
         public async Task NewCustomer_OKResult_ShouldReturnTrue()
         {
             //Arrange
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -141,7 +141,7 @@ namespace Customer.UnitTests
         public async Task NewCustomer_NotFoundResult_ShouldReturnFalse()
         {
             //Arrange
-            DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
+            DefaultSetup(HttpStatusCode.NotFound);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -165,7 +165,7 @@ namespace Customer.UnitTests
         public async Task NewCustomer_Null_ShouldReturnFalse()
         {
             //Arrange
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer");
 
             //Act
@@ -190,7 +190,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             reviewUriValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -215,7 +215,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             reviewUriValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -240,7 +240,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerAuthServerUrlKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -265,7 +265,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerAuthServerUrlKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -290,7 +290,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewApiKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -315,7 +315,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewApiKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -340,7 +340,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewScopeKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -365,7 +365,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewScopeKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/");
 
             //Act
@@ -389,7 +389,7 @@ namespace Customer.UnitTests
         public async Task EditCustomer_Null_ShouldReturnFalse()
         {
             //Arrange
-            DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
+            DefaultSetup(HttpStatusCode.NotFound);
             var expectedUri = new Uri("http://test/api/Customer");
 
             //Act
@@ -413,7 +413,7 @@ namespace Customer.UnitTests
         public async Task EditCustomer_OKResult_ShouldReturnTrue()
         {
             //Arrange
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -437,7 +437,7 @@ namespace Customer.UnitTests
         public async Task EditCustomer_NotFoundResult_ShouldFalse()
         {
             //Arrange
-            DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
+            DefaultSetup(HttpStatusCode.NotFound);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -462,7 +462,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             reviewUriValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -487,7 +487,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             reviewUriValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -512,7 +512,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerAuthServerUrlKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -537,7 +537,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerAuthServerUrlKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -562,7 +562,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewApiKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -587,7 +587,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewApiKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -612,7 +612,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewScopeKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -637,7 +637,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewScopeKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -661,7 +661,7 @@ namespace Customer.UnitTests
         public async Task DeleteCustomer_OKResult_ShouldReturnTrue()
         {
             //Arrange
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
@@ -685,7 +685,7 @@ namespace Customer.UnitTests
         public async Task DeleteCustomer_NotFoundResult_ShouldFalse()
         {
             //Arrange
-            DefaultSetupRealHttpClient(HttpStatusCode.NotFound);
+            DefaultSetup(HttpStatusCode.NotFound);
             var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
@@ -710,7 +710,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             reviewUriValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
@@ -735,7 +735,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             reviewUriValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/CustomerAccount/1");
 
             //Act
@@ -760,7 +760,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerAuthServerUrlKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -785,7 +785,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerAuthServerUrlKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -810,7 +810,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewApiKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -835,7 +835,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewApiKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -860,7 +860,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewScopeKeyValue = null;
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
@@ -885,7 +885,7 @@ namespace Customer.UnitTests
         {
             //Arrange
             customerReviewScopeKeyValue = "";
-            DefaultSetupRealHttpClient(HttpStatusCode.OK);
+            DefaultSetup(HttpStatusCode.OK);
             var expectedUri = new Uri("http://test/api/Customer/1");
 
             //Act
