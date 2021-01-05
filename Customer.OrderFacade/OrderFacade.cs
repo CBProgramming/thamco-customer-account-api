@@ -13,7 +13,6 @@ namespace Customer.OrderFacade
 {
     public class OrderFacade : IOrderFacade
     {
-        private readonly IConfiguration _config;
         private readonly IHttpHandler _handler;
         private string customerAuthUrl;
         private string customerOrdseringApi;
@@ -22,12 +21,14 @@ namespace Customer.OrderFacade
 
         public OrderFacade(IConfiguration config, IHttpHandler handler)
         {
-            _config = config;
             _handler = handler;
-            customerAuthUrl = config.GetSection("CustomerAuthServerUrlKey").Value;
-            customerOrdseringApi = config.GetSection("CustomerOrderingAPIKey").Value;
-            customerOrdseringScope = config.GetSection("CustomerOrderingScopeKey").Value;
-            customerUri = config.GetSection("CustomerUri").Value;
+            if (config != null)
+            {
+                customerAuthUrl = config.GetSection("CustomerAuthServerUrlKey").Value;
+                customerOrdseringApi = config.GetSection("CustomerOrderingAPIKey").Value;
+                customerOrdseringScope = config.GetSection("CustomerOrderingScopeKey").Value;
+                customerUri = config.GetSection("CustomerUri").Value;
+            }
         }
 
         public async Task<bool> DeleteCustomer(int customerId)

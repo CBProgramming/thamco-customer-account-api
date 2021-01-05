@@ -17,7 +17,5 @@ namespace HttpManager
         public Task<string> GetTokenEndPoint(DiscoveryDocumentResponse disco);
 
         public Task<string> GetAccessToken(TokenResponse tokenResponse);
-
-
     }
 }

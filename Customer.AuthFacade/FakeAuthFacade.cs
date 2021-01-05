@@ -8,9 +8,11 @@ namespace Customer.AuthFacade
     public class FakeAuthFacade : IAuthFacade
     {
         public bool Succeeds = true;
+        public string CustomerAuthId;
 
         public async Task<bool> DeleteAccount(string customerAuthId)
         {
+            CustomerAuthId = customerAuthId;
             return Succeeds;
         }
     }

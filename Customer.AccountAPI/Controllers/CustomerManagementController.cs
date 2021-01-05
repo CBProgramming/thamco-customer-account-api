@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Customer.AccountAPI.Models;
 using Customer.AuthFacade;
 using Customer.OrderFacade;
@@ -26,12 +27,14 @@ namespace Customer.AccountAPI.Controllers
         private readonly ILogger<CustomerManagementController> _logger;
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _config;
         private readonly IOrderFacade _orderFacade;
         private readonly IReviewCustomerFacade _reviewFacade;
         private readonly IAuthFacade _authFacade;
 
-        public CustomerManagementController(ILogger<CustomerManagementController> logger, ICustomerRepository customerRepository, 
-            IMapper mapper, IOrderFacade orderFacade, IReviewCustomerFacade reviewFacade, IAuthFacade authFacade)
+        public CustomerManagementController(IConfiguration config, ILogger<CustomerManagementController> logger, 
+            ICustomerRepository customerRepository, IMapper mapper, IOrderFacade orderFacade, 
+            IReviewCustomerFacade reviewFacade, IAuthFacade authFacade)
         {
             _logger = logger;
             _customerRepository = customerRepository;
@@ -39,6 +42,7 @@ namespace Customer.AccountAPI.Controllers
             _orderFacade = orderFacade;
             _reviewFacade = reviewFacade;
             _authFacade = authFacade;
+            _config = config;
         }
 
         [HttpPut("{customerId}")]
@@ -106,19 +110,21 @@ namespace Customer.AccountAPI.Controllers
 
         private async Task<bool> AnonymiseCustomer(int customerId)
         {
+            string anonString = _config.GetSection("AnonymisedString").Value;
             var customer = new CustomerDto
             {
                 CustomerId = customerId,
-                GivenName = "Anonymised",
-                FamilyName = "Anonymised",
-                AddressOne = "Anonymised",
-                AddressTwo = "Anonymised",
-                Town = "Anonymised",
-                State = "Anonymised",
-                AreaCode = "Anonymised",
-                Country = "Anonymised",
-                EmailAddress = "anon@anon.com",
-                TelephoneNumber = "00000000000",
+                CustomerAuthId = anonString,
+                GivenName = anonString,
+                FamilyName = anonString,
+                AddressOne = anonString,
+                AddressTwo = anonString,
+                Town = anonString,
+                State = anonString,
+                AreaCode = anonString,
+                Country = anonString,
+                EmailAddress = _config.GetSection("AnonymisedEmail").Value,
+                TelephoneNumber = _config.GetSection("AnonymisedPhone").Value,
                 CanPurchase = false,
                 Active = false
             };

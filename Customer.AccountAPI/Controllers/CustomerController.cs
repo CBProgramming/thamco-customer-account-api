@@ -10,6 +10,7 @@ using Customer.ReviewFacade.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Customer.AccountAPI.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
+        private readonly IConfiguration _config;
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
         private readonly IOrderFacade _orderFacade;
@@ -31,8 +33,9 @@ namespace Customer.AccountAPI.Controllers
         private readonly IAuthFacade _authFacade;
         private string authId, clientId, tokenCustomerId;
 
-        public CustomerController(ILogger<CustomerController> logger, ICustomerRepository customerRepository, IMapper mapper, 
-            IOrderFacade orderFacade, IReviewCustomerFacade reviewFacade, IAuthFacade authFacade)
+        public CustomerController(IConfiguration config, ILogger<CustomerController> logger, 
+            ICustomerRepository customerRepository, IMapper mapper, IOrderFacade orderFacade, 
+            IReviewCustomerFacade reviewFacade, IAuthFacade authFacade)
         {
             _logger = logger;
             _customerRepository = customerRepository;
@@ -40,6 +43,7 @@ namespace Customer.AccountAPI.Controllers
             _orderFacade = orderFacade;
             _reviewFacade = reviewFacade;
             _authFacade = authFacade;
+            _config = config;
         }
 
         private void getTokenDetails()
@@ -176,7 +180,7 @@ namespace Customer.AccountAPI.Controllers
                                 var reviewCustomer = new ReviewCustomerDto
                                 {
                                     CustomerId = customer.CustomerId,
-                                    CustomerAuthId = authId,
+                                    CustomerAuthId = customer.CustomerAuthId,
                                     CustomerName = customer.GivenName + " " + customer.FamilyName
                                 };
                                 if (!await _reviewFacade.EditCustomer(reviewCustomer))
@@ -234,19 +238,21 @@ namespace Customer.AccountAPI.Controllers
 
         private async Task<bool> AnonymiseCustomer(int customerId)
         {
+            string anonString = _config.GetSection("AnonymisedString").Value;
             var customer = new CustomerDto
             {
                 CustomerId = customerId,
-                GivenName = "Anonymised",
-                FamilyName = "Anonymised",
-                AddressOne = "Anonymised",
-                AddressTwo = "Anonymised",
-                Town = "Anonymised",
-                State = "Anonymised",
-                AreaCode = "Anonymised",
-                Country = "Anonymised",
-                EmailAddress = "anon@anon.com",
-                TelephoneNumber = "00000000000",
+                CustomerAuthId = anonString,
+                GivenName = anonString,
+                FamilyName = anonString,
+                AddressOne = anonString,
+                AddressTwo = anonString,
+                Town = anonString,
+                State = anonString,
+                AreaCode = anonString,
+                Country = anonString,
+                EmailAddress = _config.GetSection("AnonymisedEmail").Value,
+                TelephoneNumber = _config.GetSection("AnonymisedPhone").Value,
                 CanPurchase = false,
                 Active = false
             };

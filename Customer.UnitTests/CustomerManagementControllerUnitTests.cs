@@ -12,6 +12,7 @@ using Customer.ReviewFacade;
 using Customer.ReviewFacade.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -26,6 +27,7 @@ namespace Customer.UnitTests
     public class CustomerManagementControllerUnitTests
     {
         private CustomerDto customerDto;
+        private IConfiguration config;
         private CustomerRepoModel customerRepoModel;
         private FakeReviewCustomerFacade fakeReviewFacade;
         private Mock<IReviewCustomerFacade> mockReviewFacade;
@@ -38,6 +40,19 @@ namespace Customer.UnitTests
         private IMapper mapper;
         private ILogger<CustomerManagementController> logger;
         private CustomerManagementController controller;
+
+        private void SetupConfig()
+        {
+            var myConfiguration = new Dictionary<string, string>
+            {
+                {"AnonymisedString", "Anonymised"},
+                {"AnonymisedPhone", "00000000000"},
+                {"AnonymisedEmail", "anon@anon.com"},
+            };
+            config = new ConfigurationBuilder()
+                .AddInMemoryCollection(myConfiguration)
+                .Build();
+        }
 
         private void SetStandardCustomerDto()
         {
@@ -199,6 +214,7 @@ namespace Customer.UnitTests
 
         private void DefaultSetup(bool withMocks = false)
         {
+            SetupConfig();
             SetStandardCustomerDto();
             SetStandardCustomerRepoModel();
             SetFakeRepo(customerRepoModel);
@@ -213,11 +229,13 @@ namespace Customer.UnitTests
             SetMockAuthFacade();
             if (!withMocks)
             {
-                controller = new CustomerManagementController(logger, fakeRepo, mapper, fakeFacade, fakeReviewFacade, fakeAuthFacade);
+                controller = new CustomerManagementController(config, logger, fakeRepo, mapper, 
+                    fakeFacade, fakeReviewFacade, fakeAuthFacade);
             }
             else
             {
-                controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
+                controller = new CustomerManagementController(config, logger, mockRepo.Object, 
+                    mapper, mockFacade.Object, mockReviewFacade.Object,
                     mockAuthFacade.Object);
             }
             SetupUser(controller);
@@ -259,8 +277,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(true);
             SetMockCustomerRepo(customerExists: false, customerActive: false);
-            controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
-                    mockAuthFacade.Object);
+            controller = new CustomerManagementController(config, logger, mockRepo.Object, mapper, 
+                mockFacade.Object, mockReviewFacade.Object, mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -319,8 +337,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(true);
             SetMockCustomerRepo();
-            controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
-                    mockAuthFacade.Object);
+            controller = new CustomerManagementController(config, logger, mockRepo.Object, mapper,
+                mockFacade.Object, mockReviewFacade.Object, mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -380,8 +398,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(true);
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
-                    mockAuthFacade.Object);
+            controller = new CustomerManagementController(config, logger, mockRepo.Object, mapper,
+                mockFacade.Object, mockReviewFacade.Object, mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -441,8 +459,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(true);
             SetMockCustomerRepo(customerExists: false, customerActive: false);
-            controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
-                    mockAuthFacade.Object);
+            controller = new CustomerManagementController(config, logger, mockRepo.Object, mapper,
+                mockFacade.Object, mockReviewFacade.Object, mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -503,8 +521,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(true);
             SetMockCustomerRepo();
-            controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
-                    mockAuthFacade.Object);
+            controller = new CustomerManagementController(config, logger, mockRepo.Object, mapper,
+                mockFacade.Object, mockReviewFacade.Object, mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -567,8 +585,8 @@ namespace Customer.UnitTests
             DefaultSetup(true);
             customerRepoModel.Active = false;
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
-                    mockAuthFacade.Object);
+            controller = new CustomerManagementController(config, logger, mockRepo.Object, mapper,
+                mockFacade.Object, mockReviewFacade.Object, mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act
@@ -679,8 +697,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup(true);
             SetMockCustomerRepo(customerExists: false);
-            controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
-                    mockAuthFacade.Object);
+            controller = new CustomerManagementController(config, logger, mockRepo.Object, mapper,
+                mockFacade.Object, mockReviewFacade.Object, mockAuthFacade.Object);
             SetupUser(controller);
             int customerId = 2;
 
@@ -737,8 +755,8 @@ namespace Customer.UnitTests
             //Arrange
             DefaultSetup();
             SetMockCustomerRepo(customerActive: false);
-            controller = new CustomerManagementController(logger, mockRepo.Object, mapper, mockFacade.Object, mockReviewFacade.Object,
-                    mockAuthFacade.Object);
+            controller = new CustomerManagementController(config, logger, mockRepo.Object, mapper,
+                mockFacade.Object, mockReviewFacade.Object, mockAuthFacade.Object);
             SetupUser(controller);
 
             //Act

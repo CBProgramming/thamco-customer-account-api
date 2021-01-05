@@ -23,7 +23,6 @@ namespace Customer.UnitTests
         public Mock<DiscoveryDocumentResponse> mockDiscoResponse;
         public Mock<TokenResponse> mockTokenResponse;
         public ClientCredentialsTokenRequest tokenRequest;
-        public IReviewCustomerFacade facade;
         private IConfiguration config;
         private string urlKey = "url_key";
         private string urlValue = "url_value";
