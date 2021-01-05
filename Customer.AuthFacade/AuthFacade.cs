@@ -21,7 +21,7 @@ namespace Customer.AuthFacade
         }
         public async Task<bool> DeleteAccount(string customerAuthId)
         {
-            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "AuthAPI", "CustomerAuthCustomerScope");
+            HttpClient httpClient = await _handler.GetClient("CustomerAuthServerUrl", "CustomerAuthAPI", "CustomerAuthCustomerScope");
             string uri = _config.GetSection("AuthUri").Value + "/" + customerAuthId;
             if ((await httpClient.DeleteAsync(uri)).IsSuccessStatusCode)
             {
