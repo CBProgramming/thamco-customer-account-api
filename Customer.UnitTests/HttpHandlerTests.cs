@@ -17,7 +17,6 @@ namespace Customer.UnitTests
 {
     public class HttpHandlerTests
     {
-        //public Mock<HttpClient> mockClient;
         public HttpClient httpClient;
         public Mock<IUnmockablesWrapper> mockWrapper;
         public Mock<IHttpClientFactory> mockFactory;
@@ -33,7 +32,6 @@ namespace Customer.UnitTests
         private string scopeKeyValue = "scope_key_value";
         private string discoDocumentEndPoint = "disco_end_point";
         private string accessTokenValue = "access_token_value";
-        private readonly string emptyString = "";
         private readonly string originalAddress = "";
         private readonly string originalScope = "";
         private readonly string clientId = "client_id";

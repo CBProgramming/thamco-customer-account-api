@@ -25,10 +25,6 @@ namespace Customer.UnitTests
         public Mock<HttpMessageHandler> mockHandler;
         public IOrderFacade facade;
         private IConfiguration config;
-        private Mock<Task<DiscoveryDocumentResponse>> mockDisco;
-        private Mock<Task<TokenResponse>> mockTokenResponse;
-        private Task<TokenResponse> tokenResponse;
-        private Mock<DiscoveryDocumentRequest> mockDiscoRequest;
         private Mock<IHttpHandler> mockHttpHandler;
         private string customerUriValue = "/api/Customer/";
         private string customerAuthServerUrlKeyValue = "CustomerAuthServerUrl";
@@ -128,27 +124,6 @@ namespace Customer.UnitTests
             facade = new OrderFacade.OrderFacade(config, mockHttpHandler.Object);
             SetupConfig();
         }
-
-/*        private void SetupTokenResponse()
-        {
-            SetupRealHttpClient(new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.OK
-            });
-            tokenResponse = client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-            {
-                Address = "http://fakeendpoint.com",
-                ClientId = "clientId",
-                ClientSecret = "clientSecret",
-                Scope = "customer_ordering_api"
-            });
-        }*/
-
-/*        private void SetupMockDiscoveryDocument()
-        {
-            mockDisco = new Mock<Task<DiscoveryDocumentResponse>>(MockBehavior.Strict);
-        }*/
-
 
         [Fact]
         public async Task NewCustomer_OKResult_ShouldReturnTrue()

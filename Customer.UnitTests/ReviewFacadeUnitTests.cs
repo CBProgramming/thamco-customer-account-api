@@ -113,27 +113,6 @@ namespace Customer.UnitTests
             SetupConfig();
         }
 
-        /*        private void SetupTokenResponse()
-                {
-                    SetupRealHttpClient(new HttpResponseMessage
-                    {
-                        StatusCode = HttpStatusCode.OK
-                    });
-                    tokenResponse = client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-                    {
-                        Address = "http://fakeendpoint.com",
-                        ClientId = "clientId",
-                        ClientSecret = "clientSecret",
-                        Scope = "customer_ordering_api"
-                    });
-                }*/
-
-        /*        private void SetupMockDiscoveryDocument()
-                {
-                    mockDisco = new Mock<Task<DiscoveryDocumentResponse>>(MockBehavior.Strict);
-                }*/
-
-
         [Fact]
         public async Task NewCustomer_OKResult_ShouldReturnTrue()
         {
