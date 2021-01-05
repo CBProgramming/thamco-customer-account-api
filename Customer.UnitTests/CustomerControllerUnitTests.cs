@@ -2432,7 +2432,7 @@ namespace Customer.UnitTests
             Assert.Equal(customerDto.Active, fakeOrderFacade.Customer.Active);
             Assert.NotNull(fakeOrderFacade.Customer);
             Assert.Equal(customerDto.CustomerId, fakeReviewFacade.Customer.CustomerId);
-            Assert.Null(fakeReviewFacade.Customer.CustomerAuthId);
+            Assert.Equal(customerDto.CustomerAuthId,fakeReviewFacade.Customer.CustomerAuthId);
             Assert.Equal(customerDto.GivenName + " " + customerDto.FamilyName, fakeReviewFacade.Customer.CustomerName);
             Assert.Equal(0, fakeReviewFacade.CustomerId);
             Assert.NotNull(fakeReviewFacade.Customer);

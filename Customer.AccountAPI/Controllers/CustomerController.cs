@@ -145,7 +145,7 @@ namespace Customer.AccountAPI.Controllers
                         var reviewCustomer = new ReviewCustomerDto
                         {
                             CustomerId = customer.CustomerId,
-                            CustomerAuthId = authId,
+                            CustomerAuthId = customer.CustomerAuthId,
                             CustomerName = customer.GivenName + " " + customer.FamilyName
                         };
                         if (!await _reviewFacade.NewCustomer(reviewCustomer))

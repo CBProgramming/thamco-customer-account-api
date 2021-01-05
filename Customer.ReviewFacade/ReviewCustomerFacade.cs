@@ -12,7 +12,6 @@ namespace Customer.ReviewFacade
 {
     public class ReviewCustomerFacade : IReviewCustomerFacade
     {
-        private readonly IConfiguration _config;
         private readonly IHttpHandler _handler;
         private string customerAuthUrl;
         private string customerReviewApi;
@@ -21,12 +20,14 @@ namespace Customer.ReviewFacade
 
         public ReviewCustomerFacade(IConfiguration config, IHttpHandler handler)
         {
-            _config = config;
             _handler = handler;
-            customerAuthUrl = config.GetSection("CustomerAuthServerUrlKey").Value;
-            customerReviewApi = config.GetSection("CustomerReviewAPIKey").Value;
-            customerReviewScope = config.GetSection("CustomerReviewScopeKey").Value;
-            reviewUri = config.GetSection("ReviewUri").Value;
+            if (config != null)
+            {
+                customerAuthUrl = config.GetSection("CustomerAuthServerUrlKey").Value;
+                customerReviewApi = config.GetSection("CustomerReviewAPIKey").Value;
+                customerReviewScope = config.GetSection("CustomerReviewScopeKey").Value;
+                reviewUri = config.GetSection("ReviewUri").Value;
+            }
         }
 
         public async Task<bool> DeleteCustomer(int customerId)
