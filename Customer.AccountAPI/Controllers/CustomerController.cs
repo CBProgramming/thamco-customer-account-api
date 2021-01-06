@@ -64,7 +64,7 @@ namespace Customer.AccountAPI.Controllers
 
         // GET: api/<controller>
         [HttpGet("{customerId}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Get([FromRoute] int customerId)
         {
             if (await _customerRepository.CustomerExists(customerId)
@@ -152,8 +152,9 @@ namespace Customer.AccountAPI.Controllers
                         {
                             //write to local db to be reattempted later
                         }
+                        return Ok();
                     }
-                    return Ok();
+                    return NotFound();
                 }
                 else
                 {
