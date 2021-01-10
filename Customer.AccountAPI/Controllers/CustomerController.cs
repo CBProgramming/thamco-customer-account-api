@@ -107,8 +107,11 @@ namespace Customer.AccountAPI.Controllers
         {
             if (customer != null)
             {
-/*                customer.CustomerId = customerId;
-                customer.Active = true;*/
+                if (customerId > 0)
+                {
+                    customer.CustomerId = customerId;
+                }
+                customer.Active = true;
                 return await NewOrEditedCustomer(customer);
             }
             return UnprocessableEntity();
