@@ -71,11 +71,6 @@ namespace Customer.AccountAPI
                 .AddAuthenticationSchemes("CustomerAuth", "StaffAuth")
                 .Build();
 
-                /*                OptionsBuilderConfigurationExtensions.AddPolicy("CustomerOnly", new AuthorizationPolicyBuilder()
-                                    .RequireAuthenticatedUser()
-                                    .AddAuthenticationSchemes("CustomerAuth")
-                                    .RequireClaim("role", "Customer")
-                                    .Build());*/
                 OptionsBuilderConfigurationExtensions.AddPolicy("CustomerOnly", policy =>
                 policy.AddAuthenticationSchemes("CustomerAuth")
                 .RequireAssertion(context =>
@@ -86,7 +81,7 @@ namespace Customer.AccountAPI
                 OptionsBuilderConfigurationExtensions.AddPolicy("StaffOnly", new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("StaffAuth")
-                    //.RequireClaim("role", "ManageCustomerAccounts")
+                    .RequireClaim("role", "Customer Account Manager")
                     .Build());
             });
 
