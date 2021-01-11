@@ -100,7 +100,7 @@ namespace Customer.OrderFacade
                 }
             }
             return false;
-        }//
+        }
 
         private bool ValidConfigStrings()
         {
