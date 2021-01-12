@@ -93,16 +93,18 @@ namespace Customer.AccountAPI
                      optionsBuilder.EnableRetryOnFailure(10, TimeSpan.FromSeconds(10), null);
                  }));
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-/*            if (Env.IsDevelopment())
+            if (Env.IsDevelopment())
             {
                 services.AddScoped<IOrderFacade, FakeOrderFacade>();
+                services.AddScoped<IAuthFacade, FakeAuthFacade>();
+                services.AddScoped<IReviewCustomerFacade, FakeReviewCustomerFacade>();
             }
             else
-            {*/
+            {
                 services.AddScoped<IOrderFacade, OrderFacade.OrderFacade>();
-            services.AddScoped<IAuthFacade, AuthFacade.AuthFacade>();
-            services.AddScoped<IReviewCustomerFacade, ReviewCustomerFacade>();
-            //}
+                services.AddScoped<IAuthFacade, AuthFacade.AuthFacade>();
+                services.AddScoped<IReviewCustomerFacade, ReviewCustomerFacade>();
+            }
 
             services.AddScoped<ProtocolResponse, DiscoveryDocumentResponse>();
 
